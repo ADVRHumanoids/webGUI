@@ -1,0 +1,10 @@
+<p>
+  slider-control  <button type="button" (click)="onMaster()">Set Web Master</button> 
+ <button type="button" (click)="type='range'">R</button><button type="button" (click)="type='number'">N</button> 
+</p>
+<li *ngFor="let item of chains; let i=index"> {{item.Chain}}
+  
+  {{item.Val.Name}} {{item.Val.Id}} <input [type]="type" #Input name="range" [(ngModel)]="chains[i].Val.Val" min={{item.Val.Llimit}}  max={{item.Val.Ulimit}} step="0.1" (change)="sendVal(Input.value,item.Val.Id)" > {{item.Val.Val}}
+</li>
+
+ 

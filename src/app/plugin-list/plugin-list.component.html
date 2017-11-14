@@ -1,0 +1,9 @@
+<p>
+  plugin-list
+</p>
+<li *ngFor="let item of plugins"> {{item.Name}} {{item.Status}}
+    <button type="button" (click)="onStart(item.Name)">Start</button> 
+    <button type="button" (click)="onStop(item.Name)">Stop</button> 
+     <input type="text"  #cmd>
+     <button type="button" (click)="onCmd(item.Name, cmd.value)">Cmd</button> 
+  </li>
