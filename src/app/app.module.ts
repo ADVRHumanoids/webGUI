@@ -9,12 +9,14 @@ import { AppComponent } from './app.component';
 import { PluginListComponent } from './plugin-list/plugin-list.component';
 import { SliderControlComponent } from './slider-control/slider-control.component';
 import { FormsModule } from '@angular/forms';
+import { CanvasComponent } from './canvas/canvas.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PluginListComponent,
-    SliderControlComponent
+    SliderControlComponent,
+    CanvasComponent
   ],
   imports: [
     BrowserModule,

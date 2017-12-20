@@ -16,6 +16,16 @@ export class SliderControlComponent implements OnInit {
   private chains = [];
   private jid = [];
   private jval = [];
+  private evval = [];
+  private vvval = [];
+  private svval = [];
+  private dvval = [];
+
+  private pval = 0.0;
+  private vval = 0.0;
+  private eval = 0.0;
+  private sval = 0.0;
+  private dval = 0.0;
 
  constructor(http: Http) { 
     
@@ -31,7 +41,9 @@ export class SliderControlComponent implements OnInit {
            let p =o["Val"];
            let chna =o["Chain"];
             for (let u of p){
-              this.chains.push({ Chain: chna, Val:{ Name :u["Name"] , Id: u["ID"], Val: u["Lval"], Llimit: u["Llimit"], Ulimit: u["Ulimit"] } });
+              this.chains.push({ Chain: chna, Val:{ Name :u["Name"] , Id: u["ID"], JVal: u["Lval"],
+              VVal: u["Vval"], EVal: u["Eval"], SVal: u["Sval"], DVal: u["Dval"],
+              Llimit: u["Llimit"], Ulimit: u["Ulimit"] } });
             }
         }
       },
@@ -53,10 +65,42 @@ export class SliderControlComponent implements OnInit {
        });
   }
 
-  sendVal(param: number, id:number){
+  setPosRef(param: number){
+
+    this.pval = param;
+
+  }
+
+  setVelRef(param: number){
+    
+   this.vval = param;
+    
+  }
+
+  setEffortRef(param: number){
+    
+   this.eval = param;
+    
+  }
+
+  setStiffRef(param: number){
+    
+    this.sval = param;
+    
+  }
+
+  setDampRef(param: number){
+    
+    this.dval = param;
+    
+  }
+
+  sendVal(id:number){
 
     //{"joint":[{"id": 15, "val": 0},{"id": 16, "val": 0}]}
-    this.service.create({"joint":[{"id": Number(id), "val": Number(param)}]})
+    this.service.create({"joint":[{"id": Number(id), "pos": Number(this.pval),
+    "vel": Number(this.vval),  "eff": Number(this.eval),  "stiff": Number(this.sval),
+    "damp": Number(this.dval) }]})
     .subscribe(
       response => {
         
@@ -79,6 +123,7 @@ export class SliderControlComponent implements OnInit {
        });
 
   }
+
 
   onMaster(){
 
@@ -119,12 +164,33 @@ export class SliderControlComponent implements OnInit {
             this.jval.push(o);
         }
 
+        for (let o of response["effort"]){
+          this.evval.push(o);
+        }
+
+        for (let o of response["link_velocity"]){
+          this.vvval.push(o);
+        }
+
+        for (let o of response["stiffness"]){
+          this.svval.push(o);
+        }
+
+        for (let o of response["damping"]){
+          this.dvval.push(o);
+        }
+        
+
         for (let entry of this.chains) {
         
           for(let i in this.jval){
 
             if(entry.Val.Id == this.jid[i]){
-              entry.Val.Val = this.jval[i];
+              entry.Val.JVal = this.jval[i];
+              entry.Val.VVal = this.vvval[i];
+              entry.Val.EVal = this.evval[i];
+              entry.Val.SVal = this.svval[i];
+              entry.Val.DVal = this.dvval[i];
             }
           }
         }
