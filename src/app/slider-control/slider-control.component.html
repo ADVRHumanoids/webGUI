@@ -4,10 +4,10 @@
 </p>
 <li *ngFor="let item of chains; let i=index"> {{item.Chain}}
   
-  {{item.Val.Name}} {{item.Val.Id}} <p>PositionRef</p><input [type]="type" #Input name="range" [(ngModel)]="chains[i].Val.JVal" min={{item.Val.Llimit}}  max={{item.Val.Ulimit}} step="0.1" (change)="setPosRef(Input.value)" > {{item.Val.JVal}}
+  {{item.Val.Name}} {{item.Val.Id}} <p>PositionRef</p><input [type]="type" #Input name="range" [(ngModel)]="chains[i].Val.PRef" min={{item.Val.Llimit}}  max={{item.Val.Ulimit}} step="0.1" (change)="setPosRef(Input.value)" > {{item.Val.PRef}}
   
-  <p>VelocityRef</p><input [type]="type" #Vel name="range" [(ngModel)]="chains[i].Val.VVal"  step="0.1" (change)="setVelRef(Vel.value)" > {{item.Val.VVal}}
-  <p>EffortRef</p><input [type]="type" #Eff name="range" [(ngModel)]="chains[i].Val.EVal" step="0.1" (change)="setEffortRef(Eff.value)" > {{item.Val.EVal}}
+  <p>VelocityRef</p><input [type]="type" #Vel name="range" [(ngModel)]="chains[i].Val.VRef"  step="0.1" (change)="setVelRef(Vel.value)" > {{item.Val.VRef}}
+  <p>EffortRef</p><input [type]="type" #Eff name="range" [(ngModel)]="chains[i].Val.ERef" step="0.1" (change)="setEffortRef(Eff.value)" > {{item.Val.ERef}}
   <p>Stiffness</p><input [type]="type" #Stiff name="range" [(ngModel)]="chains[i].Val.SVal" min=0.0  max=10000.0  step="0.1" (change)="setStiffRef(Stiff.value)" > {{item.Val.SVal}}
   <p>Damping</p><input [type]="type" #Damp name="range" [(ngModel)]="chains[i].Val.DVal" min=0.0  max=10000.0 step="0.1" (change)="setDampRef(Damp.value)" > {{item.Val.DVal}}
   <button type="button" (click)="setPosRef(Input.value); setVelRef(Vel.value); setEffortRef(Eff.value); setStiffRef(Stiff.value); setDampRef(Damp.value); sendVal(item.Val.Id)">SEND</button>

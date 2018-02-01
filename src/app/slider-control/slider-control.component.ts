@@ -20,6 +20,9 @@ export class SliderControlComponent implements OnInit {
   private vvval = [];
   private svval = [];
   private dvval = [];
+  private posref = [];
+  private velref = [];
+  private effref = [];
 
   private pval = 0.0;
   private vval = 0.0;
@@ -42,8 +45,8 @@ export class SliderControlComponent implements OnInit {
            let chna =o["Chain"];
             for (let u of p){
               this.chains.push({ Chain: chna, Val:{ Name :u["Name"] , Id: u["ID"], JVal: u["Lval"],
-              VVal: u["Vval"], EVal: u["Eval"], SVal: u["Sval"], DVal: u["Dval"],
-              Llimit: u["Llimit"], Ulimit: u["Ulimit"] } });
+              VVal: u["Vval"], EVal: u["Eval"], SVal: u["Sval"], DVal: u["Dval"], PRef: u["pos_ref"],
+              VRef: u["vel_ref"], ERef: u["eff_ref"], Llimit: u["Llimit"], Ulimit: u["Ulimit"] } });
             }
         }
       },
@@ -181,6 +184,18 @@ export class SliderControlComponent implements OnInit {
         }
         
 
+        for (let o of response["pos_ref"]){
+          this.posref.push(o);
+        }
+
+        for (let o of response["vel_ref"]){
+          this.velref.push(o);
+        }
+
+        for (let o of response["eff_ref"]){
+          this.effref.push(o);
+        }
+
         for (let entry of this.chains) {
         
           for(let i in this.jval){
@@ -191,6 +206,9 @@ export class SliderControlComponent implements OnInit {
               entry.Val.EVal = this.evval[i];
               entry.Val.SVal = this.svval[i];
               entry.Val.DVal = this.dvval[i];
+              entry.Val.PRef = this.posref[i];
+              entry.Val.VRef = this.velref[i];
+              entry.Val.ERef = this.effref[i];
             }
           }
         }
