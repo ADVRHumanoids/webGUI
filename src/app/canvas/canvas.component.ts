@@ -1,5 +1,20 @@
-import { Component, OnInit, ElementRef, ViewChild} from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input} from '@angular/core';
 import * as THREE from 'three';
+import { HttpService } from './../services/http.service';
+import { Http } from '@angular/http';
+import { NotFoundError } from './../common/not-foud-error';
+import { AppError } from './../common/app-error';
+var OrbitControls = require('three-orbit-controls')(THREE)
+//import * as STLLoader from 'three-stl-loader';
+var STLLoader = require('three-stl-loader')(THREE)
+//declare var ColladaLoader : any;
+//var ColladaLoader = require('three-collada-loader')(THREE);
+//import {ColladaLoader} from "three";
+///var coll_loader = new ColladaLoader();
+var loader = new STLLoader()
+import TrackballControls = THREE.TrackballControls;
+import { Scene, Vector2, Material, } from 'three';
+import { join } from 'path';
 
 @Component({
   selector: 'app-canvas',
@@ -16,20 +31,190 @@ export class CanvasComponent implements OnInit {
     private scene: THREE.Scene;
     private camera: THREE.PerspectiveCamera;
     private renderer: THREE.WebGLRenderer;
-  
+    private controls: any;
+    private robot: Array<THREE.Object3D>;
+
+    private linkmap = new Map<string, THREE.Object3D>();
+   
+    private jointmap = new Map<string, THREE.Object3D>();
+
+    private selectedObject: any;
+    private raycaster: THREE.Raycaster;
+    private mouse : THREE.Vector2;
     private cube : THREE.Mesh;
-  
-    constructor(){
+    
+    private order = 'XYZ';
+    private vval: number;
+    private service;
+
+    constructor(http: Http) { 
       console.log(THREE);
-  
+      this.service = new HttpService("/model",http);
     }
   
+    createNode(pos,rot_axis,angle,scale, axis, name){
+      
+      var tmp = new THREE.Mesh();
+      tmp.position.set( pos[0], pos[1], pos[2] );
+      //tmp.userdate = axis
+      if(rot_axis != null)
+        tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+      //if (scale != null)
+        //tmp.scale.set( scale[0], scale[1], scale[2] );
+      return tmp;
+    }
+
+    createNode1(pos,rot_axis,angle, axis){
+      
+      var tmp = new THREE.Object3D();
+      tmp.position.set( pos[0], pos[1], pos[2] );
+      //tmp.userdate = axis
+      if(rot_axis != null)
+       tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+      return tmp;
+    }
+
+    getData(){
+
+      this.service.get("/model")
+      .subscribe(
+        response => {
+          var root = response["Model"];
+          var joints = root["Joint"];
+          var links = root["Link"]
+          for (let link of links){
+            var name = link["Name"];
+            var pos = link["Pos"];
+            if (pos == null) pos = [0,0,0];
+            pos = [pos[0]*1000, pos[1]*1000, pos[2]*1000 ];
+            var rot = link["Rot"];
+            var axis;
+            var angle;
+            if ( rot != null){
+              axis = rot["Axis"];
+              angle = rot["Angle"];
+            }else {
+              axis = null;
+              angle = null;
+            }
+            var mesh = link["Mesh"];
+            var material = link["Material"];
+            var scale = link["Scale"];
+            var nodel = this.createNode(pos,axis,angle,scale, null, name);
+            //if (mesh != null)
+             nodel.userData = mesh;
+            this.linkmap.set(name, nodel);
+          }
+
+          for (let joint of joints){
+            var name = joint["Name"];
+            var child = joint["Child"];
+            var parent = joint["Parent"];
+            var pos = joint["Pos"];
+            if (pos == null) pos = [0,0,0];
+            pos = [pos[0]*1000, pos[1]*1000, pos[2]*1000 ];
+            var rot = joint["Rot"];
+            var axis;
+            var angle;
+            if ( rot != null){
+              axis = rot["Axis"];
+              angle = rot["Angle"];
+            }else {
+              axis = null;
+              angle = null;
+            }
+            var nodel1 = this.createNode1(pos,axis,angle, null);
+            var clink = this.linkmap.get(child);
+            var plink = this.linkmap.get(parent);
+            nodel1.add(clink);
+            plink.add(nodel1);
+            this.jointmap.set(name, nodel1);
+          }
+
+           //this.scene.add(this.jointmap.get("world_iiwa_joint"));
+           var root_link = root["Root_Link"];
+           var root_joint = root["Root_Joint"];
+           var link = this.linkmap.get(root_link);
+           var joint = this.jointmap.get(root_joint);
+           link.rotation.set(-Math.PI/2 , 0, 0 );
+           link.add(joint);
+           this.scene.add(link);
+           /*var t =this.jointmap.get("ankle_yaw_1");
+           this.scene.add(t);*/
+
+           //console.log(link);
+
+           //load meshes
+          this.linkmap.forEach((value: THREE.Object3D, key: string) => {
+            if(value.userData != null){
+              var mesh = <string>value.userData;
+              //console.log("GET MESH "+ mesh);
+              mesh = mesh.substr(10);
+              mesh = "/robots/"+mesh;
+              loader.load(mesh, (geometry, id = key) => 
+              {this.loadMesh(geometry,id)});
+            }
+          });
+
+        },
+        (error: AppError) => {
+  
+          if (error instanceof NotFoundError){
+            //expected error
+            //deleted
+            //this.form.setErrors(error.json());
+          }
+          else{
+            //unexpected error
+            throw error;
+  
+          }
+          
+         });
+
+    }
+
     ngOnInit(){
       this.container = this.elementRef.nativeElement;
+      //console.log(this.container);
+      this.raycaster = new THREE.Raycaster ();
+      this.mouse = new THREE.Vector2 ();
+      this.robot = new Array<THREE.Object3D>();
+      this.init(); 
+      this.getData();
+    }
+
+    setVelRef(param: number){
       
-      console.log(this.container);
+     this.vval = param;
+     this.selectedObject.rotateOnAxis(new THREE.Vector3(0,0,1),param);
+    }
   
-      this.init();
+    loadMesh(geometry, id){
+
+      var material;
+      //console.log("ID "+id);
+      if (geometry.hasColors) {
+          material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+        } 
+        else{
+          material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+        }
+
+      geometry.computeFaceNormals();
+      let  mesh = new THREE.Mesh( geometry, material );
+      material.side = THREE.DoubleSide;
+      //THREE.EventDispatcher.call( mesh );
+      //mesh.addEventListener('click', function(event) {alert("GOT THE EVENT");});
+      //mesh.dispatchEvent({type:'click'});
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      let my = <THREE.Mesh>this.linkmap.get(id);
+      my.geometry = mesh.geometry;
+      my.material = mesh.material;
+      //my.scale.set( 0.001, 0.001, 0.001 );
+      //console.log("MEH "+my);
+      //my.rotation.set(mesh.rotation.x,mesh.rotation.y,mesh.rotation.z);
     }
   
     init(){
@@ -48,40 +233,59 @@ export class CanvasComponent implements OnInit {
       this.camera = new THREE.PerspectiveCamera(view.angle, view.aspect, view. near, view.far);
       this.renderer = new THREE.WebGLRenderer();
   
+      this.controls = new OrbitControls(this.camera,this.renderer.domElement);
+      this.scene.background = new THREE.Color( 0x72645b );
       this.scene.add(this.camera);
-      this.scene.add(new THREE.AxisHelper(20));
+      //this.scene.add(new THREE.AxisHelper(20));
       
-      this.camera.position.set(10,10,10);
+       // lights
+      var light = new THREE.PointLight( 0xffffff, 0.8 );
+      this.camera.add( light );
+
+      this.camera.position.set(1,0.5,2);
       this.camera.lookAt(new THREE.Vector3(0,0,0));
   
+      //this.camera.up.set(0,0,1);
+      this.scene.add( new THREE.AmbientLight( 0x222222 ) );
       this.renderer.setSize(screen.width, screen.height);
       this.container.appendChild(this.renderer.domElement);
-  
-  
-      let geometry = new THREE.BoxGeometry(5, 5, 5),
-          material = new THREE.MeshBasicMaterial({ color : 0xFFFFFF, wireframe: true });
-          
-      this.cube = new THREE.Mesh( geometry, material );
-      this.cube.position.set(-50,-50,-50);
-      
-      this.scene.add(this.cube);
-      
+ 
       this.render();
     }
   
+    @HostListener('document:mousedown', ['$event'])
+    checkIntersection (event: MouseEvent) {
+      var rect = this.renderer.domElement.getBoundingClientRect();
+      this.mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+      this.mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+      //console.log(this.mouse.x + "" +this.mouse.y);
+      this.CheckIntersection ();
+      //console.log(this.scene);
+    }
+
     render(){
-  
       let self: CanvasComponent = this;
-      
       (function render(){
         requestAnimationFrame(render);
         self.renderer.render(self.scene, self.camera);
-  
-        self.animate();
+        //self.animate();
       }());
       
     }
   
+    CheckIntersection () {
+      this.raycaster.setFromCamera (this.mouse, this.camera);
+      let intersects = this.raycaster.intersectObjects ( this.scene.children, true);
+      console.log(this.scene.children);
+      if (intersects.length > 0) {
+        this.selectedObject = intersects[0].object;
+        console.log(this.selectedObject);
+        //selectedObject.rotateZ(Math.PI/2);
+        //rotate around axis read 
+        //selectedObject.rotateOnAxis(new THREE.Vector3(0,0,1),Math.PI/2);
+    }
+  }
+
     animate(){
       this.cube.rotateX(0.1);
       this.cube.rotateY(0.1);
