@@ -14,7 +14,6 @@ var STLLoader = require('three-stl-loader')(THREE)
 var loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
-import { join } from 'path';
 
 @Component({
   selector: 'app-canvas',
@@ -57,10 +56,12 @@ export class CanvasComponent implements OnInit {
       var tmp = new THREE.Mesh();
       tmp.position.set( pos[0], pos[1], pos[2] );
       //tmp.userdate = axis
-      if(rot_axis != null)
+      if(rot_axis != null){
         tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
-      //if (scale != null)
-        //tmp.scale.set( scale[0], scale[1], scale[2] );
+      }
+      if (scale != null)
+        tmp.scale.set( 1, 1, 1 );
+
       return tmp;
     }
 
@@ -69,8 +70,9 @@ export class CanvasComponent implements OnInit {
       var tmp = new THREE.Object3D();
       tmp.position.set( pos[0], pos[1], pos[2] );
       //tmp.userdate = axis
-      if(rot_axis != null)
-       tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+      if(rot_axis != null){
+        tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+      }
       return tmp;
     }
 
@@ -86,7 +88,6 @@ export class CanvasComponent implements OnInit {
             var name = link["Name"];
             var pos = link["Pos"];
             if (pos == null) pos = [0,0,0];
-            pos = [pos[0]*1000, pos[1]*1000, pos[2]*1000 ];
             var rot = link["Rot"];
             var axis;
             var angle;
@@ -101,8 +102,8 @@ export class CanvasComponent implements OnInit {
             var material = link["Material"];
             var scale = link["Scale"];
             var nodel = this.createNode(pos,axis,angle,scale, null, name);
-            //if (mesh != null)
-             nodel.userData = mesh;
+            if (mesh != null)
+              nodel.userData = {"mesh":mesh, "scale": scale};
             this.linkmap.set(name, nodel);
           }
 
@@ -112,7 +113,6 @@ export class CanvasComponent implements OnInit {
             var parent = joint["Parent"];
             var pos = joint["Pos"];
             if (pos == null) pos = [0,0,0];
-            pos = [pos[0]*1000, pos[1]*1000, pos[2]*1000 ];
             var rot = joint["Rot"];
             var axis;
             var angle;
@@ -131,7 +131,6 @@ export class CanvasComponent implements OnInit {
             this.jointmap.set(name, nodel1);
           }
 
-           //this.scene.add(this.jointmap.get("world_iiwa_joint"));
            var root_link = root["Root_Link"];
            var root_joint = root["Root_Joint"];
            var link = this.linkmap.get(root_link);
@@ -139,20 +138,18 @@ export class CanvasComponent implements OnInit {
            link.rotation.set(-Math.PI/2 , 0, 0 );
            link.add(joint);
            this.scene.add(link);
-           /*var t =this.jointmap.get("ankle_yaw_1");
-           this.scene.add(t);*/
-
-           //console.log(link);
 
            //load meshes
           this.linkmap.forEach((value: THREE.Object3D, key: string) => {
             if(value.userData != null){
-              var mesh = <string>value.userData;
+              var mesh = <string>value.userData["mesh"];
               //console.log("GET MESH "+ mesh);
-              mesh = mesh.substr(10);
-              mesh = "/robots/"+mesh;
-              loader.load(mesh, (geometry, id = key) => 
-              {this.loadMesh(geometry,id)});
+              if (mesh != null){
+                mesh = mesh.substr(10);
+                mesh = "/robots/"+mesh;
+                loader.load(mesh, (geometry, id = key) => 
+                {this.loadMesh(geometry,id)});
+              }
             }
           });
 
@@ -201,7 +198,7 @@ export class CanvasComponent implements OnInit {
           material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
         }
 
-      geometry.computeFaceNormals();
+      //geometry.computeFaceNormals();
       let  mesh = new THREE.Mesh( geometry, material );
       material.side = THREE.DoubleSide;
       //THREE.EventDispatcher.call( mesh );
@@ -211,10 +208,12 @@ export class CanvasComponent implements OnInit {
       mesh.receiveShadow = true;
       let my = <THREE.Mesh>this.linkmap.get(id);
       my.geometry = mesh.geometry;
+      var scale = my.userData["scale"];
+      if (scale != null)
+        my.geometry.scale(scale[0],scale[1],scale[2]);
       my.material = mesh.material;
-      //my.scale.set( 0.001, 0.001, 0.001 );
-      //console.log("MEH "+my);
-      //my.rotation.set(mesh.rotation.x,mesh.rotation.y,mesh.rotation.z);
+      geometry.computeFaceNormals();
+      geometry.computeVertexNormals();
     }
   
     init(){
