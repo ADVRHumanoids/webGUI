@@ -44,8 +44,7 @@ export class WebsocketService {
       this.messages = <Subject<any>>this
       .connectInternal(url)
       .map((response: MessageEvent): any => {
-        //let data = JSON.parse(response.data);
-        let data = response.data;
+        let data = JSON.parse(response.data);
         return data;
       });
   

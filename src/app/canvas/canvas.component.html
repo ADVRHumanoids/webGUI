@@ -1,2 +1,9 @@
 <div #container></div>
-<!--<p>VelocityRef</p><input [type]="type" #Vel name="range" [(ngModel)]="valore"  step="0.1" (change)="setVelRef(Vel.value)" >--> 
+  <li > 
+    <p>ID: {{robotState.id}}  Name: {{robotState.name}}</p>
+    <p>Motor Position: {{robotState.motorPos}}  Link Position: {{robotState.linkPos}}</p>
+    <p>Motor Velocity: {{robotState.motorVel}}  Link Velocity: {{robotState.linkVel}}</p>
+    <p>Stiffness: {{robotState.stiff}}  Damping: {{robotState.damp}}</p>
+    <p>Torque: {{robotState.effort}}  Fault: {{robotState.fault}}</p>
+    <p>Temperature: {{robotState.temp}}  Aux: {{robotState.aux}}</p>
+  </li>
