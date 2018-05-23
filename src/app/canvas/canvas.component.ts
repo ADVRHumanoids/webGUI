@@ -37,7 +37,7 @@ export class CanvasComponent implements OnInit {
    
     private jointmap = new Map<string, THREE.Object3D>();
 
-    private selectedObject: any;
+    private selectedObject: THREE.Object3D;
     private raycaster: THREE.Raycaster;
     private mouse : THREE.Vector2;
     private cube : THREE.Mesh;
@@ -51,11 +51,10 @@ export class CanvasComponent implements OnInit {
       this.service = new HttpService("/model",http);
     }
   
-    createNode(pos,rot_axis,angle,scale, axis, name){
+    createNodeLink(pos,rot_axis,angle,scale){
       
       var tmp = new THREE.Mesh();
       tmp.position.set( pos[0], pos[1], pos[2] );
-      //tmp.userdate = axis
       if(rot_axis != null){
         tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
       }
@@ -65,11 +64,10 @@ export class CanvasComponent implements OnInit {
       return tmp;
     }
 
-    createNode1(pos,rot_axis,angle, axis){
+    createNodeJoint(pos,rot_axis,angle){
       
       var tmp = new THREE.Object3D();
       tmp.position.set( pos[0], pos[1], pos[2] );
-      //tmp.userdate = axis
       if(rot_axis != null){
         tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
       }
@@ -101,7 +99,7 @@ export class CanvasComponent implements OnInit {
             var mesh = link["Mesh"];
             var material = link["Material"];
             var scale = link["Scale"];
-            var nodel = this.createNode(pos,axis,angle,scale, null, name);
+            var nodel = this.createNodeLink(pos,axis,angle,scale);
             if (mesh != null)
               nodel.userData = {"mesh":mesh, "scale": scale};
             this.linkmap.set(name, nodel);
@@ -123,7 +121,9 @@ export class CanvasComponent implements OnInit {
               axis = null;
               angle = null;
             }
-            var nodel1 = this.createNode1(pos,axis,angle, null);
+            var raxis = joint["Axis"];
+            var nodel1 = this.createNodeJoint(pos,axis,angle);
+            nodel1.userData = {"axis": raxis};
             var clink = this.linkmap.get(child);
             var plink = this.linkmap.get(parent);
             nodel1.add(clink);
@@ -258,8 +258,8 @@ export class CanvasComponent implements OnInit {
       this.mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
       this.mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
       //console.log(this.mouse.x + "" +this.mouse.y);
-      this.CheckIntersection ();
-      //console.log(this.scene);
+      if(event.which === 1)
+        this.CheckIntersection ();
     }
 
     render(){
@@ -267,7 +267,6 @@ export class CanvasComponent implements OnInit {
       (function render(){
         requestAnimationFrame(render);
         self.renderer.render(self.scene, self.camera);
-        //self.animate();
       }());
       
     }
@@ -275,21 +274,19 @@ export class CanvasComponent implements OnInit {
     CheckIntersection () {
       this.raycaster.setFromCamera (this.mouse, this.camera);
       let intersects = this.raycaster.intersectObjects ( this.scene.children, true);
-      console.log(this.scene.children);
+      //console.log(this.scene.children);
       if (intersects.length > 0) {
         this.selectedObject = intersects[0].object;
-        console.log(this.selectedObject);
-        //selectedObject.rotateZ(Math.PI/2);
-        //rotate around axis read 
-        //selectedObject.rotateOnAxis(new THREE.Vector3(0,0,1),Math.PI/2);
+        //console.log(this.selectedObject);
+        var userdata = this.selectedObject.parent.userData;
+        if (userdata != null){
+          var axis = userdata["axis"];
+          //rotate around axis read 
+          if (axis != null){
+           this.selectedObject.parent.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),Math.PI/2);
+          }
+        }
     }
-  }
-
-    animate(){
-      this.cube.rotateX(0.1);
-      this.cube.rotateY(0.1);
-      this.cube.position.addScalar(0.2);
-  
   }
 
 }
