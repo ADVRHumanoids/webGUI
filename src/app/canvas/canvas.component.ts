@@ -15,6 +15,11 @@ var loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
 
+import { Observable, Subject } from 'rxjs/Rx';
+import { WebsocketService } from './../services/websocket.service';
+
+const WS_URL = 'ws://127.0.0.1:8081/websocket';
+
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
@@ -45,12 +50,22 @@ export class CanvasComponent implements OnInit {
     private order = 'XYZ';
     private vval: number;
     private service;
+    private wsService: WebsocketService;
 
-    constructor(http: Http) { 
+    constructor(http: Http, wsService: WebsocketService) { 
       console.log(THREE);
       this.service = new HttpService("/model",http);
+      this.wsService = wsService;
+      this.wsService.connect(WS_URL);
+      this.wsService.messages.subscribe(msg => {		
+        this.sendMsg();
+      });
     }
   
+    sendMsg() {
+      this.wsService.messages.next({"msg":"Send"});
+    }
+
     createNodeLink(pos,rot_axis,angle,scale){
       
       var tmp = new THREE.Mesh();

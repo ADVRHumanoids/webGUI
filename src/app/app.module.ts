@@ -1,4 +1,5 @@
 import { HttpService } from './services/http.service';
+import { WebsocketService } from './services/websocket.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppErrorHandler } from './common/app-error-handler';
@@ -25,6 +26,7 @@ import { CanvasComponent } from './canvas/canvas.component';
   ],
   providers: [
      HttpService,
+     WebsocketService,
     { provide: ErrorHandler, useClass: AppErrorHandler}
   ],
   bootstrap: [AppComponent]
