@@ -1,9 +1,20 @@
 <div #container></div>
-  <li > 
-    <p>ID: {{robotState.id}}  Name: {{robotState.name}}</p>
-    <p>Motor Position: {{robotState.motorPos}}  Link Position: {{robotState.linkPos}}</p>
-    <p>Motor Velocity: {{robotState.motorVel}}  Link Velocity: {{robotState.linkVel}}</p>
-    <p>Stiffness: {{robotState.stiff}}  Damping: {{robotState.damp}}</p>
-    <p>Torque: {{robotState.effort}}  Fault: {{robotState.fault}}</p>
-    <p>Temperature: {{robotState.temp}}  Aux: {{robotState.aux}}</p>
-  </li>
+<div *ngIf="isJoint;else sensor">
+    <li > 
+        <p>ID: {{robotState.id}}  Name: {{robotState.name}}</p>
+        <p>Motor Position: {{robotState.motorPos}}  Link Position: {{robotState.linkPos}}</p>
+        <p>Motor Velocity: {{robotState.motorVel}}  Link Velocity: {{robotState.linkVel}}</p>
+        <p>Stiffness: {{robotState.stiff}}  Damping: {{robotState.damp}}</p>
+        <p>Torque: {{robotState.effort}}  Fault: {{robotState.fault}}</p>
+        <p>Temperature: {{robotState.temp}}  Aux: {{robotState.aux}}</p>
+    </li>
+</div>
+<ng-template #sensor>
+    <li > 
+        <p>ID: {{robotSensorState.id}}  Name: {{robotSensorState.name}}</p>
+        <p>Force: {{robotSensorState.force}}</p>
+        <p>Torque: {{robotSensorState.torque}}</p>
+    </li>
+</ng-template>
+  
+  

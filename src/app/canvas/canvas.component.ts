@@ -17,9 +17,6 @@ import { Scene, Vector2, Material, } from 'three';
 
 import { Observable, Subject } from 'rxjs/Rx';
 import { WebsocketService } from './../services/websocket.service';
-import { join } from 'path';
-import { link } from 'fs';
-import { useAnimation } from '@angular/core/src/animation/dsl';
 
 var WS_URL;
 
@@ -55,7 +52,10 @@ export class CanvasComponent implements OnInit {
     private wsService: WebsocketService;
     private isModelLoaded: boolean;
     private robot: Map<string, any>;
+    private robotSensor: Map<string, any>;
     private selectJoint: string;
+    private selectMaterial: any;
+    private isJoint = true;
 
     private robotState = {
       name: "",
@@ -72,6 +72,13 @@ export class CanvasComponent implements OnInit {
       aux : 0
     }
 
+    private robotSensorState = {
+      name: "",
+      id: 0,
+      force: [0,0,0],
+      torque: [0,0,0]
+    }
+
     constructor(http: Http, wsService: WebsocketService) { 
       console.log(THREE);
       this.isModelLoaded = true;
@@ -81,12 +88,23 @@ export class CanvasComponent implements OnInit {
       this.service = new HttpService("/model",http);
       this.wsService = wsService;
       this.robot = new Map<string, any>();
+      this.robotSensor = new Map<string, any>();
       this.wsService.connect(WS_URL);
       this.wsService.messages.subscribe(msg => {		
         this.parseMsg(msg);
         var item = this.robot.get(this.selectJoint);
         if (item != null)
           this.robotState = item;
+
+        if (this.selectedObject != null){
+          var userdata = this.selectedObject.userData;
+          if (userdata != null){
+            var sensor = userdata["name"];
+            var items = this.robotSensor.get(sensor);
+            if (items != null)
+              this.robotSensorState = items;
+          }
+        }
         this.sendMsg();
     });
     }
@@ -94,19 +112,20 @@ export class CanvasComponent implements OnInit {
     parseMsg(msg){
 
       if (this.isModelLoaded){
-      var nameList = msg["joint_name"];
-      if (nameList != null){
-        var ids = msg["joint_id"];
-        var motors = msg["motor_position"];
-        var links = msg["link_position"];
-        var motorsv = msg["motor_velocity"];
-        var linksv = msg["link_velocity"];
-        var temps = msg["temperature"];
-        var efforts = msg["effort"];
-        var stiffs = msg["stiffness"];
-        var damps = msg["damping"];
-        var faults = msg["fault"];
-        var auxs = msg["aux"];
+      var robot = msg["Robot"];
+      if (robot != null){
+        var nameList = robot["joint_name"];
+        var ids = robot["joint_id"];
+        var motors = robot["motor_position"];
+        var links = robot["link_position"];
+        var motorsv = robot["motor_velocity"];
+        var linksv = robot["link_velocity"];
+        var temps = robot["temperature"];
+        var efforts = robot["effort"];
+        var stiffs = robot["stiffness"];
+        var damps = robot["damping"];
+        var faults = robot["fault"];
+        var auxs = robot["aux"];
 
         for (let i = 0; i < nameList.length ; i++) {
           this.robot.set(nameList[i],{
@@ -135,6 +154,27 @@ export class CanvasComponent implements OnInit {
               //joint.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
             }
           }*/
+        }
+      }
+      var sensors = msg["Sensors"];
+      if (sensors != null){
+        var nameList = sensors["ft_name"];
+        var ids = sensors["ft_id"];
+        var forces = sensors["force"];
+        var torques = sensors["torque"];
+        var forcesv = [0,0,0];
+        var torquesv = [0,0,0];
+        for (let i = 0; i < nameList.length ; i++) {
+          if(forces != null)
+            forcesv = forces[i]["Vector"];
+          if(forces != null)
+            torquesv = torques[i]["Vector"];
+          this.robotSensor.set(nameList[i],{
+            name: nameList[i],
+            id: ids[i],
+            force: forcesv,
+            torque: torquesv
+          });
         }
       }
     }
@@ -220,6 +260,13 @@ export class CanvasComponent implements OnInit {
         if (mesh != null)
           nodel.userData = {"mesh":mesh, "scale": scale, "load": false};
         this.linkmap.set(name, nodel);
+        var sensor = link["Sensor"];
+        if (sensor != null){
+          var marker = this.addSensorMarker([0,0,0],0.08);
+          nodel.geometry = marker.geometry;
+          nodel.material = marker.material;
+          nodel.userData = {"name":name};
+        }
       }
 
     }
@@ -283,6 +330,28 @@ export class CanvasComponent implements OnInit {
       this.mouse = new THREE.Vector2 ();
       this.init(); 
       this.getData();
+      /*var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+      
+      var geometry = new THREE.Geometry();
+      geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
+      geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
+      geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
+      var line = new THREE.Line( geometry, material );
+      this.scene.add( line );
+
+      var pos = [0,0,0];
+      this.addSensorMarker(pos,1);*/
+     
+      
+    }
+
+    addSensorMarker(pos, size){
+
+      var geometry = new THREE.BoxGeometry( size, size, size );
+      var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+      var cube = new THREE.Mesh( geometry, material );
+      cube.position.set(pos[0],pos[1],pos[2]);
+      return cube;
     }
 
     setVelRef(param: number){
@@ -387,11 +456,22 @@ export class CanvasComponent implements OnInit {
       let intersects = this.raycaster.intersectObjects ( this.scene.children, true);
       //console.log(this.scene.children);
       if (intersects.length > 0) {
+        if (this.selectedObject != null){
+          (<THREE.Mesh>this.selectedObject).material = this.selectMaterial;
+        }
         this.selectedObject = intersects[0].object;
+        this.selectMaterial = (<THREE.Mesh>this.selectedObject).material;
+        (<THREE.Mesh>this.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
         //console.log(this.selectedObject);
         var userdata = this.selectedObject.parent.userData;
-        if (userdata != null)
+        if (userdata != null){
+          if (this.jointmap.get(userdata["name"])!= null) this.isJoint = true;
           this.selectJoint = userdata["name"];
+        }
+        var userdata = this.selectedObject.userData;
+        if (userdata != null){
+          if (this.robotSensor.get(userdata["name"])!= null) this.isJoint = false;
+        }
     }
   }
 
