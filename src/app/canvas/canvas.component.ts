@@ -293,8 +293,7 @@ export class CanvasComponent implements OnInit {
           this.linkmap.forEach((value: THREE.Object3D, key: string) => {
             if(value.userData != null){
               var mesh = <string>value.userData["mesh"];
-              //console.log("GET MESH "+ mesh);
-              if (mesh != null){
+              if (mesh != null && mesh.substr(mesh.length-3) == "stl"){
                 mesh = mesh.substr(10);
                 mesh = "/robots/"+mesh;
                 loader.load(mesh, (geometry, id = key) => 
@@ -330,21 +329,19 @@ export class CanvasComponent implements OnInit {
       this.mouse = new THREE.Vector2 ();
       this.init(); 
       this.getData();
-      /*var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-      
-      var geometry = new THREE.Geometry();
-      geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
-      geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
-      geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
-      var line = new THREE.Line( geometry, material );
-      this.scene.add( line );
-
-      var pos = [0,0,0];
-      this.addSensorMarker(pos,1);*/
-     
-      
     }
 
+    addVectorMarker(){
+
+      var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+      
+      var geometry = new THREE.Geometry();
+      geometry.vertices.push(new THREE.Vector3( 0, 0, 0) );
+      geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
+      var line = new THREE.Line( geometry, material );
+      return line;
+    }
+    
     addSensorMarker(pos, size){
 
       var geometry = new THREE.BoxGeometry( size, size, size );
