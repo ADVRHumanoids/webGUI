@@ -1,3 +1,4 @@
+import { PlotterComponent } from './plotter/plotter.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { SliderControlComponent } from './slider-control/slider-control.component';
 import { PluginListComponent } from './plugin-list/plugin-list.component';

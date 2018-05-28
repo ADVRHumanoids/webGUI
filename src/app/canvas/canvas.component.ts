@@ -293,16 +293,18 @@ export class CanvasComponent implements OnInit {
           this.linkmap.forEach((value: THREE.Object3D, key: string) => {
             if(value.userData != null){
               var mesh = <string>value.userData["mesh"];
-              if (mesh != null && mesh.substr(mesh.length-3) == "stl"){
-                mesh = mesh.substr(10);
-                mesh = "/robots/"+mesh;
-                loader.load(mesh, (geometry, id = key) => 
-                {this.loadMesh(geometry,id)});
+              if (mesh != null){
+                var ext = mesh.substr(mesh.length-3);
+                if (ext != null)
+                  if (ext.toUpperCase() == "STL"){
+                    mesh = mesh.substr(10);
+                    mesh = "/robots/"+mesh;
+                    loader.load(mesh, (geometry, id = key) => 
+                    {this.loadMesh(geometry,id)});
+                  }
               }
-            }
+            } 
           });
-
-          
 
         },
         (error: AppError) => {
