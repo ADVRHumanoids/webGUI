@@ -1,3 +1,4 @@
+import { RobotStateService } from './services/robot-state.service';
 import { HttpService } from './services/http.service';
 import { WebsocketService } from './services/websocket.service';
 import { BrowserModule } from '@angular/platform-browser';
@@ -29,6 +30,7 @@ import { PlotterComponent } from './plotter/plotter.component';
   providers: [
      HttpService,
      WebsocketService,
+     RobotStateService,
     { provide: ErrorHandler, useClass: AppErrorHandler}
   ],
   bootstrap: [AppComponent]

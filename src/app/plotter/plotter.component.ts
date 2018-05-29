@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as Chart from 'chart.js';
 import { Observable, Subject } from 'rxjs/Rx';
-import { WebsocketService } from './../services/websocket.service';
+import { RobotStateService } from './../services/robot-state.service';
 
 var WS_URL;
 
@@ -17,7 +17,7 @@ export class PlotterComponent implements AfterViewInit{
   ctx: any;
   private data : any;
   private myChart: any;
-  private wsService: WebsocketService;
+  private robotService: RobotStateService;
   private samples: number;
   private delete: boolean;
   private isfrozen: boolean;
@@ -31,46 +31,22 @@ export class PlotterComponent implements AfterViewInit{
     grey: 'rgb(201, 203, 207)'
   };
 
-  sendMsg() {
-    this.wsService.messages.next({"msg":"Send"});
-  }
-
-  parseMsg(msg){
-    
-      var robot = msg["Robot"];
-      if (robot != null){
-        var nameList = robot["joint_name"];
-        var ids = robot["joint_id"];
-        var motors = robot["motor_position"];
-        var links = robot["link_position"];
-        var motorsv = robot["motor_velocity"];
-        var linksv = robot["link_velocity"];
-        var temps = robot["temperature"];
-        var efforts = robot["effort"];
-        var stiffs = robot["stiffness"];
-        var damps = robot["damping"];
-        var faults = robot["fault"];
-        var auxs = robot["aux"];
-        
-        var val = Math.round(motors[15] * 100) / 100;
-        this.addDataToDataset(this.data.datasets[0],val,new Date().getTime());
-
-      }
-  }
-
-  constructor(wsService: WebsocketService) {
-    this.wsService = wsService;
+  constructor(robotService: RobotStateService) {
+    this.robotService = robotService;
     this.delete = false;
     this.isfrozen = false;
     this.samples = 600;
-    var ip = window.location.origin;
-    ip = ip.substr(7);
-    WS_URL = "ws://"+ip+"/websocket";
-    this.wsService.connect(WS_URL);
-    this.wsService.messages.subscribe(msg => {		
-     
-      this.parseMsg(msg);
-      this.sendMsg();
+   
+    this.robotService.currentmsg.subscribe(msg => {		
+
+      var robot = msg["robot"];
+      if(robot == null) return;
+      var item =robot.get("RElbj");
+      if(item == null) return;
+      var motorPos = item["motorPos"];
+      var val = Math.round(motorPos * 100) / 100;
+      this.addDataToDataset(this.data.datasets[0],val,new Date().getTime());
+      
     });
 
     setInterval(()=>{ 
