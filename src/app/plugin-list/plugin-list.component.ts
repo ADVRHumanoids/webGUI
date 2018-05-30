@@ -1,4 +1,4 @@
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { HttpService } from './../services/http.service';
 import { Component, OnInit } from '@angular/core';
 import { AppError } from './../common/app-error';
@@ -16,7 +16,7 @@ export class PluginListComponent implements OnInit {
   private service;
   private plugins = [];
 
-  constructor(http: Http) { 
+  constructor(http: HttpClient) { 
     
     this.service = new HttpService("/plugins",http);
   }

@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as Chart from 'chart.js';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
 var WS_URL;

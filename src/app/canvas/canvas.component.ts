@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input} from '@angular/core';
 import * as THREE from 'three';
 import { HttpService } from './../services/http.service';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { NotFoundError } from './../common/not-foud-error';
 import { AppError } from './../common/app-error';
 var OrbitControls = require('three-orbit-controls')(THREE)
@@ -14,7 +14,7 @@ var STLLoader = require('three-stl-loader')(THREE)
 var loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
 @Component({
@@ -80,7 +80,7 @@ export class CanvasComponent implements OnInit {
       torquez: 0,
     }
 
-    constructor(http: Http, robotService: RobotStateService) { 
+    constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
       this.isModelLoaded = true;
       this.service = new HttpService("/model",http);

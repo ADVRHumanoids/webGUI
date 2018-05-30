@@ -1,6 +1,8 @@
+
+import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import * as Rx from 'rxjs/Rx';
-import { Observable, Subject } from 'rxjs/Rx';
+import * as Rx from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class WebsocketService {
@@ -42,11 +44,11 @@ export class WebsocketService {
 
     public connect(url){
       this.messages = <Subject<any>>this
-      .connectInternal(url)
-      .map((response: MessageEvent): any => {
+      .connectInternal(url).pipe(
+      map((response: MessageEvent): any => {
         let data = JSON.parse(response.data);
         return data;
-      });
+      }));
   
     }
     

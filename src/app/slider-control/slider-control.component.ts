@@ -1,7 +1,7 @@
 import { NotFoundError } from './../common/not-foud-error';
 import { AppError } from './../common/app-error';
 import { HttpService } from './../services/http.service';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, NgModule } from '@angular/core';
 
 @Component({
@@ -30,7 +30,7 @@ export class SliderControlComponent implements OnInit {
   private sval = 0.0;
   private dval = 0.0;
 
- constructor(http: Http) { 
+ constructor(http: HttpClient) { 
     
     this.service = new HttpService("/singlejoint",http);
   }

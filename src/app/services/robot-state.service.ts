@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import * as Rx from 'rxjs/Rx';
-import { Observable, Subject } from 'rxjs/Rx';
+import * as Rx from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { WebsocketService } from './websocket.service';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable()
 export class RobotStateService {

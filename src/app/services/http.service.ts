@@ -1,50 +1,47 @@
+
+import {throwError as observableThrowError, Observable} from 'rxjs';
 import { Injectable } from '@angular/core';
 import { NotFoundError } from './../common/not-foud-error';
 import { AppError } from './../common/app-error';
-import { Http, RequestOptions, Headers } from '@angular/http';
-import {Observable} from 'rxjs/Observable'
-import 'rxjs/add/operator/catch';
-import 'rxjs//add/observable/throw';
-import 'rxjs/add/operator/map';
+//import { Http, RequestOptions, Headers } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
+
+//import 'rxjs//add/observable/throw';
+
 
 @Injectable()
 export class HttpService {
 
-  constructor(private url: string,private http: Http) { }
+  constructor(private url: string,private http: HttpClient) { }
 
 
   getAll(){
 
-   return this.http.get(this.url)
-   .map(response => response.json())
-   .catch(this.handleError);;
+    
+   return this.http.get(this.url);
 
   }
 
   get(url){
 
-   return this.http.get(url)
-   .map(response => response.json())
-   .catch(this.handleError);;
+   return this.http.get(url);
 
   }
 
    create(resource){
 
     let headers = new Headers({'Content-Type': 'application/json'});
-   let options = new RequestOptions({ headers: headers});
-    return this.http.post(this.url, JSON.stringify(resource),options)
-    .map(response => response.json())
-    .catch(this.handleError);
+   //let options = new RequestOptions({ headers: headers});
+    return this.http.post(this.url, JSON.stringify(resource)); //,options);
    }
 
     post(url,resource){
 
     let headers = new Headers({'Content-Type': 'application/json'});
-   let options = new RequestOptions({ headers: headers});
-    return this.http.post(url, JSON.stringify(resource),options)
-    .map(response => response.json())
-    .catch(this.handleError);
+    //let options = new RequestOptions({ headers: headers});
+    return this.http.post(url, JSON.stringify(resource)); //,options)
+    //.map(response => response.json())
+    //.catch(this.handleError);
    }
 
    updatePost(resource){
@@ -72,8 +69,8 @@ export class HttpService {
     private handleError(error: Response){
 
        if(error.status === 404)
-          return Observable.throw(new NotFoundError());
+          return observableThrowError(new NotFoundError());
 
-      return Observable.throw(new AppError(error));
+      return observableThrowError(new AppError(error));
     }
 }

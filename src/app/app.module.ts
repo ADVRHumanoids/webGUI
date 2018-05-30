@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppErrorHandler } from './common/app-error-handler';
 import {ErrorHandler} from '@angular/core';
-import {HttpModule} from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { PluginListComponent } from './plugin-list/plugin-list.component';
@@ -13,6 +13,9 @@ import { SliderControlComponent } from './slider-control/slider-control.componen
 import { FormsModule } from '@angular/forms';
 import { CanvasComponent } from './canvas/canvas.component';
 import { PlotterComponent } from './plotter/plotter.component';
+
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatToolbarModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -24,8 +27,10 @@ import { PlotterComponent } from './plotter/plotter.component';
   ],
   imports: [
     BrowserModule,
-    HttpModule,
-    FormsModule
+    HttpClientModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    MatToolbarModule
   ],
   providers: [
      HttpService,
