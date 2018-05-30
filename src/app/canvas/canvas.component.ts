@@ -72,8 +72,12 @@ export class CanvasComponent implements OnInit {
     private robotSensorState = {
       name: "",
       id: 0,
-      force: [0,0,0],
-      torque: [0,0,0]
+      forcex: 0,
+      forcey: 0,
+      forcez: 0,
+      torquex: 0,
+      torquey: 0,
+      torquez: 0,
     }
 
     constructor(http: Http, robotService: RobotStateService) { 
@@ -273,6 +277,10 @@ export class CanvasComponent implements OnInit {
       var cube = new THREE.Mesh( geometry, material );
       cube.position.set(pos[0],pos[1],pos[2]);
       return cube;
+    }
+
+    addPlot(id, topic, name){
+      this.robotService.addPlot(id,topic,name);
     }
 
     setVelRef(param: number){

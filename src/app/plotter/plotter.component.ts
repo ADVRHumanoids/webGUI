@@ -21,6 +21,7 @@ export class PlotterComponent implements AfterViewInit{
   private samples: number;
   private delete: boolean;
   private isfrozen: boolean;
+  private map: Map<string, number>;
   private chartColors = {
     red: 'rgb(255, 99, 132)',
     orange: 'rgb(255, 159, 64)',
@@ -33,34 +34,29 @@ export class PlotterComponent implements AfterViewInit{
 
   constructor(robotService: RobotStateService) {
     this.robotService = robotService;
-    this.delete = false;
     this.isfrozen = false;
-    this.samples = 600;
-   
-    this.robotService.currentmsg.subscribe(msg => {		
-
-      var robot = msg["robot"];
-      if(robot == null) return;
-      var item =robot.get("RElbj");
-      if(item == null) return;
-      var motorPos = item["motorPos"];
-      var val = Math.round(motorPos * 100) / 100;
-      this.addDataToDataset(this.data.datasets[0],val,new Date().getTime());
-      
-    });
+    this.samples = 500;
+    this.data = {
+      labels: [],
+      datasets: []
+    };
+    this.map = new Map<string, number> ();
 
     setInterval(()=>{ 
-      this.delete = true;
+      if (this.isfrozen)return;
+      if(this.data.labels.length > this.samples)
+        this.data.labels.splice(0, 1);
+        for (let d of this.data.datasets){
+          if(d.data.length > this.samples)
+            d.data.splice(0, 1);
+        }
+      
     },10);
     
   } 
     
   ngAfterViewInit() {
 
-    this.data = {
-      labels: [],
-      datasets: []
-    };
     this.canvas = document.getElementById('myChart');
     this.ctx = this.canvas.getContext('2d');
     this.myChart = new Chart(this.ctx, {
@@ -106,7 +102,33 @@ export class PlotterComponent implements AfterViewInit{
 			}
     });
 
-    this.addDataset("test");
+    this.robotService.currentPlotAddDatamsg.subscribe(msg => {		
+      
+      if(msg == null)return;
+      if (this.isfrozen)return;
+      this.data.labels.push(new Date().getTime());
+      for (let pdata of msg){
+        var name = pdata["name"];
+        if(name == null) return;
+        var i = this.map.get(name);
+        var value = pdata["value"];
+        value = Math.round(value * 100) / 100;
+        //console.log("ACCESS TO pos "+ i +" value "+value);
+        this.addDataToDataset(this.data.datasets[i],value);
+      }
+    });
+
+    this.robotService.currentPlotAddmsg.subscribe(msg => {	
+      if(msg == null)return;
+      var topic = msg["topic"];
+      if( topic == null) return;
+      var id = msg["id"];
+      var name = msg["name"];
+      this.addDataset(name+"/"+topic);
+      var i = this.data.datasets.length -1;
+      this.map.set(id,i);
+      //console.log("ADD plot at "+ "pos "+i+" name "+name);
+    });
   }
 
   setScale(val){
@@ -124,6 +146,8 @@ export class PlotterComponent implements AfterViewInit{
 
     this.data.labels = [];
     this.data.datasets = [];
+    this.robotService.clearPlot();
+    this.myChart.update();
   }
 
   addDataset(label){
@@ -138,23 +162,19 @@ export class PlotterComponent implements AfterViewInit{
       data: [],
       fill: false};
 
+    this.data.labels = [];
+    for (let d of this.data.datasets)
+        d.data = [];
+
     this.data.datasets.push(data);
     this.myChart.update();
   }
 
-  addDataToDataset(dataset, value, label){
+  addDataToDataset(dataset, value){
 
-      if (this.isfrozen)return;
-      dataset.data.push(value);
-      this.data.labels.push(label);
-
-      if( this.delete && dataset.data.length > this.samples){
-        dataset.data.splice(0, 5);
-        this.data.labels.splice(0, 5);
-        //console.log(dataset.data.length);
-        this.delete = false;
-      }
-      this.myChart.update();
-    }
+    dataset.data.push(value);
+    //console.log("label "+ dataset.label+ " "+dataset.data.length);
+    this.myChart.update();
+  }
 
 }

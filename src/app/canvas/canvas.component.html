@@ -2,18 +2,29 @@
 <div *ngIf="isJoint;else sensor">
     <li > 
         <p>ID: {{robotState.id}}  Name: {{robotState.name}}</p>
-        <p>Motor Position: {{robotState.motorPos}}  Link Position: {{robotState.linkPos}}</p>
-        <p>Motor Velocity: {{robotState.motorVel}}  Link Velocity: {{robotState.linkVel}}</p>
-        <p>Stiffness: {{robotState.stiff}}  Damping: {{robotState.damp}}</p>
-        <p>Torque: {{robotState.effort}}  Fault: {{robotState.fault}}</p>
-        <p>Temperature: {{robotState.temp}}  Aux: {{robotState.aux}}</p>
+        <p>Motor Position: {{robotState.motorPos}} <button type="button" (click)="addPlot(robotState.id,'motorPos',robotState.name)">Plot</button>
+             Link Position: {{robotState.linkPos}} <button type="button" (click)="addPlot(robotState.id,'linkPos',robotState.name)">Plot</button></p> 
+        <p>Motor Velocity: {{robotState.motorVel}} <button type="button" (click)="addPlot(robotState.id,'motorVel',robotState.name)">Plot</button>
+             Link Velocity: {{robotState.linkVel}} <button type="button" (click)="addPlot(robotState.id,'linkVel',robotState.name)">Plot</button></p>
+        <p>Stiffness: {{robotState.stiff}} <button type="button" (click)="addPlot(robotState.id,'stiff',robotState.name)">Plot</button>
+             Damping: {{robotState.damp}} <button type="button" (click)="addPlot(robotState.id,'damp',robotState.name)">Plot</button></p>
+        <p>Torque: {{robotState.effort}} <button type="button" (click)="addPlot(robotState.id,'effort',robotState.name)">Plot</button> 
+            Fault: {{robotState.fault}} <button type="button" (click)="addPlot(robotState.id,'fault',robotState.name)">Plot</button></p>
+        <p>Temperature: {{robotState.temp}} <button type="button" (click)="addPlot(robotState.id,'temp',robotState.name)">Plot</button> 
+            Aux: {{robotState.aux}} <button type="button" (click)="addPlot(robotState.id,'aux',robotState.name)">Plot</button></p>
     </li>
 </div>
 <ng-template #sensor>
     <li > 
         <p>ID: {{robotSensorState.id}}  Name: {{robotSensorState.name}}</p>
-        <p>Force: {{robotSensorState.force}}</p>
-        <p>Torque: {{robotSensorState.torque}}</p>
+        <p>Force: x:{{robotSensorState.forcex}} <button type="button" (click)="addPlot(robotSensorState.id,'forcex',robotSensorState.name)">Plot</button> 
+            y:{{robotSensorState.forcey}} <button type="button" (click)="addPlot(robotSensorState.id,'forcey',robotSensorState.name)">Plot</button>
+            z:{{robotSensorState.forcez}} <button type="button" (click)="addPlot(robotSensorState.id,'forcez',robotSensorState.name)">Plot</button>
+        </p>
+        <p>Torque: x:{{robotSensorState.torquex}} <button type="button" (click)="addPlot(robotSensorState.id,'torquex',robotSensorState.name)">Plot</button>
+            y:{{robotSensorState.torquey}} <button type="button" (click)="addPlot(robotSensorState.id,'torquey',robotSensorState.name)">Plot</button>
+            z:{{robotSensorState.torquez}} <button type="button" (click)="addPlot(robotSensorState.id,'torquez',robotSensorState.name)">Plot</button>      
+        </p>
     </li>
 </ng-template>
   

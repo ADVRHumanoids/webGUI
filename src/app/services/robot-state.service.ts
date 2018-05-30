@@ -12,6 +12,12 @@ export class RobotStateService {
   private robotSensor: Map<string, any>;
   private parsedMsg = new BehaviorSubject<any>({});
   currentmsg = this.parsedMsg.asObservable();
+  private plotMap = new Map<string,string>();
+  private plotArray = new Array<any>();
+  private plotAddMsg = new BehaviorSubject<any>({});
+  currentPlotAddmsg = this.plotAddMsg.asObservable();
+  private plotAddDataMsg = new BehaviorSubject<any>({});
+  currentPlotAddDatamsg = this.plotAddDataMsg.asObservable();
 
   constructor(private wsService: WebsocketService) { 
 
@@ -22,7 +28,6 @@ export class RobotStateService {
     var WS_URL = "ws://"+ip+"/websocket";
     this.wsService.connect(WS_URL);
     this.wsService.messages.subscribe(msg => {		
-      //console.log("WS plotter");
       this.parseMsg(msg);
       this.sendMsg();
      });
@@ -51,7 +56,7 @@ export class RobotStateService {
       var auxs = robot["aux"];
 
       for (let i = 0; i < nameList.length ; i++) {
-        this.robot.set(nameList[i],{
+        var obj = {
           name: nameList[i],
           id: ids[i],
           motorPos: motors[i],
@@ -64,7 +69,26 @@ export class RobotStateService {
           damp: damps[i],
           fault: faults[i],
           aux: auxs[i]
-        });
+        };
+        this.robot.set(nameList[i], obj);
+        
+        var keys =  Object.keys(obj);
+        for (let key of keys){
+          var topic = this.plotMap.get(ids[i]+"/"+key);
+          if (topic != null){
+            var pobj = {"name": ids[i]+"/"+key , "value": obj[topic]};
+            this.plotArray.push(pobj);
+          }
+        }
+        
+         
+
+        //var plotId = ids[i] +"/"+ 
+        //this.plotMap.get()
+       
+        //push to vector
+        //publish out
+        //this.plotAddDataMsg.next(obj);
         /*var angle = motorList[i];
         var joint = this.jointmap.get(nameList[i]);
         var userdata = joint.userData;
@@ -77,7 +101,9 @@ export class RobotStateService {
             //joint.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
           }
         }*/
+       
       }
+
     }
     var sensors = msg["Sensors"];
     if (sensors != null){
@@ -92,21 +118,48 @@ export class RobotStateService {
           forcesv = forces[i]["Vector"];
         if(forces != null)
           torquesv = torques[i]["Vector"];
-        this.robotSensor.set(nameList[i],{
+        var objs = {
           name: nameList[i],
           id: ids[i],
-          force: forcesv,
-          torque: torquesv
-        });
+          forcex: forcesv[0],
+          forcey: forcesv[1],
+          forcez: forcesv[2],
+          torquex: torquesv[0],
+          torquey: torquesv[1],
+          torquez: torquesv[2]
+        };
+        this.robotSensor.set(nameList[i], objs);
+        var keys =  Object.keys(objs);
+        for (let key of keys){
+          var topic = this.plotMap.get(ids[i]+"/"+key);
+          if (topic != null){
+            var pobj = {"name": ids[i]+"/"+key , "value": objs[topic]};
+            this.plotArray.push(pobj);
+          }
+        }
       }
     }
     this.publishMsg({"robot":this.robot,"sensor":this.robotSensor});
+    if(this.plotArray.length != 0 ){
+      this.plotAddDataMsg.next(this.plotArray);
+      this.plotArray = [];
+    }
   }
 
   sendMsg() {
     this.wsService.messages.next({"msg":"Send"});
   }
-    
+  
+  addPlot(id, topic, name){
+    if ( this.plotMap.get(id +"/"+ topic) != null) return;
+    var obj = {"topic": topic, "id": id +"/"+ topic, "name": name};
+    this.plotMap.set(id +"/"+ topic,topic);
+    this.plotAddMsg.next(obj);
+  }
 
+  clearPlot(){
+    this.plotMap.clear();
+    this.plotArray = [];
+  }
 
 }
