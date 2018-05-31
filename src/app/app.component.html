@@ -1,8 +1,31 @@
 <!--The content below is only a placeholder and can be replaced.-->
+
 <mat-toolbar color="primary">
-    <span>XBotCore</span>
-  </mat-toolbar>
-<app-canvas></app-canvas>
-<app-plotter></app-plotter>
-<app-plugin-list></app-plugin-list>
+    <span>ROBOT WEB GUI</span>
+</mat-toolbar>
+<mat-tab-group >
+    <mat-tab  label="Monitoring">
+        <div class="containerModelPlot"
+        fxLayout
+        fxLayout.xs="column"
+        fxLayoutAlign="center"
+        fxLayoutGap="10px"
+        fxLayoutGap.xs="0">
+      <div class="item item-1" fxFlex="50%">
+          <app-canvas></app-canvas>
+      </div>
+      <div class="item item-2" fxFlex="50%">
+        <app-plotter></app-plotter>
+      </div>
+      </div>
+      
+    </mat-tab>
+    <mat-tab label="Plugins">
+      <app-plugin-list></app-plugin-list>
+    </mat-tab>
+  </mat-tab-group>
+
 <!--<app-slider-control></app-slider-control>-->
+
+
+  

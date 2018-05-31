@@ -1,6 +1,6 @@
 <canvas id="myChart" width="400" height="400"></canvas>
 <p>
-<button type="button" (click)="clearData()">Clear Data</button> 
-<button type="button" (click)="freeze()">Freeze</button> 
+<button mat-raised-button color="primary" type="button" (click)="clearData()">Clear Data</button> 
+<button mat-raised-button color="primary" type="button" (click)="freeze()">Freeze</button> 
 <input [type]="type" #Vel name="range" step="0.1" (change)="setScale(Vel.value)" > 
 </p>
