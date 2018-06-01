@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
 */
 
-import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input} from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input,AfterViewInit} from '@angular/core';
 import * as THREE from 'three';
 import { HttpService } from './../services/http.service';
 import { HttpClient } from '@angular/common/http';
@@ -41,7 +41,7 @@ import { RobotStateService } from './../services/robot-state.service';
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.css']
 })
-export class CanvasComponent implements OnInit {
+export class CanvasComponent implements OnInit, AfterViewInit {
 
   title = 'app';
   
@@ -299,7 +299,7 @@ export class CanvasComponent implements OnInit {
     }
 
     addPlot(id, topic, name){
-      this.robotService.addPlot(id,topic,name);
+      this.robotService.addPlot(1,id,topic,name);
     }
 
     setVelRef(param: number){
@@ -357,9 +357,8 @@ export class CanvasComponent implements OnInit {
       };
   
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(view.angle, view.aspect, view. near, view.far);
+      this.camera = new THREE.PerspectiveCamera(view.angle, view.aspect, view.near, view.far);
       this.renderer = new THREE.WebGLRenderer();
-  
       this.controls = new OrbitControls(this.camera,this.renderer.domElement);
       this.scene.background = new THREE.Color( 0x72645b );
       this.scene.add(this.camera);
@@ -368,7 +367,6 @@ export class CanvasComponent implements OnInit {
        // lights
       var light = new THREE.PointLight( 0xffffff, 0.8 );
       this.camera.add( light );
-
       this.camera.position.set(1,0.5,2);
       this.camera.lookAt(new THREE.Vector3(0,0,0));
   
@@ -376,10 +374,19 @@ export class CanvasComponent implements OnInit {
       this.scene.add( new THREE.AmbientLight( 0x222222 ) );
       this.renderer.setSize(screen.width, screen.height);
       this.container.appendChild(this.renderer.domElement);
- 
       this.render();
     }
   
+    ngAfterViewInit() {
+
+      this.container.style.width = "100%";
+      this.container.style.height = "50%";
+
+      this.camera.aspect = this.getAspectRatio();
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    }
+
     @HostListener('document:mousedown', ['$event'])
     checkIntersection (event: MouseEvent) {
       var rect = this.renderer.domElement.getBoundingClientRect();
@@ -388,6 +395,26 @@ export class CanvasComponent implements OnInit {
       //console.log(this.mouse.x + "" +this.mouse.y);
       if(event.which === 1)
         this.CheckIntersection ();
+    }
+
+    private getAspectRatio(): number {
+      let height = this.container.clientHeight;
+      if (height === 0) {
+          return 0;
+      }
+      return this.container.clientWidth / this.container.clientHeight;
+    }
+
+    @HostListener('window:resize', ['$event'])
+    public onResize(event: Event) {
+        this.container.style.width = "100%";
+        this.container.style.height = "50%";
+        console.log("onResize: " + this.container.clientWidth + ", " + this.container.clientHeight);
+
+        this.camera.aspect = this.getAspectRatio();
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.render();
     }
 
     render(){

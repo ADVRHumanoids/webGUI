@@ -31,17 +31,20 @@ export class RobotStateService {
   private robotSensor: Map<string, any>;
   private parsedMsg = new BehaviorSubject<any>({});
   currentmsg = this.parsedMsg.asObservable();
-  private plotMap = new Map<string,string>();
-  private plotArray = new Array<any>();
-  private plotAddMsg = new BehaviorSubject<any>({});
-  currentPlotAddmsg = this.plotAddMsg.asObservable();
-  private plotAddDataMsg = new BehaviorSubject<any>({});
-  currentPlotAddDatamsg = this.plotAddDataMsg.asObservable();
+  private plotMap = new Map<number, Map<string,string> >();
+  private plotArrayMap = new Map<number, Array<any> >();
+
+  private plotAddMsg = new Map<number, BehaviorSubject<any> >();
+  public currentPlotAddmsg = new Map<number,Observable<any> >();
+  private plotAddDataMsg = new Map<number, BehaviorSubject<any> >();
+  public currentPlotAddDatamsg = new Map<number,Observable<any> >();
+  
 
   constructor(private wsService: WebsocketService) { 
 
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
+
     var ip = window.location.origin;
     ip = ip.substr(7);
     var WS_URL = "ws://"+ip+"/websocket";
@@ -55,6 +58,15 @@ export class RobotStateService {
   
   publishMsg(msg){
     this.parsedMsg.next(msg);
+  }
+
+  registerPlotterComponent(id){
+
+    this.plotAddDataMsg.set(id,new BehaviorSubject<any>({}));
+    this.currentPlotAddDatamsg.set(id,this.plotAddDataMsg.get(id).asObservable());
+ 
+    this.plotAddMsg.set(id,new BehaviorSubject<any>({}));
+    this.currentPlotAddmsg.set(id,this.plotAddMsg.get(id).asObservable());
   }
 
   parseMsg(msg){
@@ -90,18 +102,21 @@ export class RobotStateService {
           aux: auxs[i]
         };
         this.robot.set(nameList[i], obj);
-        
         var keys =  Object.keys(obj);
-        for (let key of keys){
-          var topic = this.plotMap.get(ids[i]+"/"+key);
-          if (topic != null){
-            var pobj = {"name": ids[i]+"/"+key , "value": obj[topic]};
-            this.plotArray.push(pobj);
+        this.plotMap.forEach((value: Map<string,string>, mkey: number) => {
+          //var plotItem = this.plotMap.get(1);
+          if (value != null){
+            for (let key of keys){
+              var topic = value.get(ids[i]+"/"+key);
+              if (topic != null){
+                var pobj = {"name": ids[i]+"/"+key , "value": obj[topic]};
+                var array = this.plotArrayMap.get(mkey);
+                if( array != null)
+                  array.push(pobj);
+              }
+            }
           }
-        }
-        
-         
-
+        });
         //var plotId = ids[i] +"/"+ 
         //this.plotMap.get()
        
@@ -120,9 +135,7 @@ export class RobotStateService {
             //joint.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
           }
         }*/
-       
       }
-
     }
     var sensors = msg["Sensors"];
     if (sensors != null){
@@ -149,36 +162,57 @@ export class RobotStateService {
         };
         this.robotSensor.set(nameList[i], objs);
         var keys =  Object.keys(objs);
-        for (let key of keys){
-          var topic = this.plotMap.get(ids[i]+"/"+key);
-          if (topic != null){
-            var pobj = {"name": ids[i]+"/"+key , "value": objs[topic]};
-            this.plotArray.push(pobj);
+        this.plotMap.forEach((value: Map<string,string>, mkey: number) => {
+          //var plotItem = this.plotMap.get(1);
+          if (value != null){
+            for (let key of keys){
+              var topic = value.get(ids[i]+"/"+key);
+              if (topic != null){
+                var pobj = {"name": ids[i]+"/"+key , "value": obj[topic]};
+                var array = this.plotArrayMap.get(mkey);
+                if( array != null)
+                  array.push(pobj);
+              }
+            }
           }
-        }
+        });
       }
     }
     this.publishMsg({"robot":this.robot,"sensor":this.robotSensor});
-    if(this.plotArray.length != 0 ){
-      this.plotAddDataMsg.next(this.plotArray);
-      this.plotArray = [];
-    }
+    this.plotArrayMap.forEach((value: any, key: number) => {
+      if( value != null && value.length != 0 ){
+        this.plotAddDataMsg.get(key).next(value);
+        this.plotArrayMap.set(key,[]);
+      }
+    });
   }
 
   sendMsg() {
     this.wsService.messages.next({"msg":"Send"});
   }
   
-  addPlot(id, topic, name){
-    if ( this.plotMap.get(id +"/"+ topic) != null) return;
+  addPlot(idPlot,id, topic, name){
+    var plotItem = this.plotMap.get(idPlot);
+    if (plotItem != null)
+    if ( plotItem.get(id +"/"+ topic) != null) return;
+
     var obj = {"topic": topic, "id": id +"/"+ topic, "name": name};
-    this.plotMap.set(id +"/"+ topic,topic);
-    this.plotAddMsg.next(obj);
+    if (plotItem == null){
+      plotItem = new Map<string,string>();
+      this.plotMap.set(idPlot,plotItem);
+    }
+    plotItem.set(id +"/"+ topic,topic);
+    
+    if (this.plotArrayMap.get(idPlot) == null)
+      this.plotArrayMap.set(idPlot, new Array<any>());
+    var addMsgItem = this.plotAddMsg.get(idPlot);
+    addMsgItem.next(obj);
   }
 
-  clearPlot(){
-    this.plotMap.clear();
-    this.plotArray = [];
+  clearPlot(idPlot){
+    var array = this.plotArrayMap.get(idPlot);
+    this.plotMap.get(idPlot).clear();
+    this.plotArrayMap.set(idPlot,[]);
   }
 
 }

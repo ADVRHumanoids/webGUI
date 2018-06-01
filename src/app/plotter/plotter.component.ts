@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
 */
 
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import * as Chart from 'chart.js';
 import { Observable, Subject } from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
@@ -31,6 +31,8 @@ var WS_URL;
 })
 
 export class PlotterComponent implements AfterViewInit{
+
+  @Input() idPlot: string;
 
   canvas: any;
   ctx: any;
@@ -69,14 +71,18 @@ export class PlotterComponent implements AfterViewInit{
           if(d.data.length > this.samples)
             d.data.splice(0, 1);
         }
-      
     },10);
     
   } 
-    
+
+  getId(){
+    return "myChart"+this.idPlot;
+  }
+
   ngAfterViewInit() {
 
-    this.canvas = document.getElementById('myChart');
+    console.log("PLOTTER ID "+this.idPlot);
+    this.canvas = document.getElementById(this.getId());
     this.ctx = this.canvas.getContext('2d');
     this.myChart = new Chart(this.ctx, {
       type: 'line',
@@ -121,7 +127,8 @@ export class PlotterComponent implements AfterViewInit{
 			}
     });
 
-    this.robotService.currentPlotAddDatamsg.subscribe(msg => {		
+    this.robotService.registerPlotterComponent(parseInt(this.idPlot));
+    this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
       
       if(msg == null)return;
       if (this.isfrozen)return;
@@ -137,7 +144,7 @@ export class PlotterComponent implements AfterViewInit{
       }
     });
 
-    this.robotService.currentPlotAddmsg.subscribe(msg => {	
+    this.robotService.currentPlotAddmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
       if(msg == null)return;
       var topic = msg["topic"];
       if( topic == null) return;
@@ -165,7 +172,7 @@ export class PlotterComponent implements AfterViewInit{
 
     this.data.labels = [];
     this.data.datasets = [];
-    this.robotService.clearPlot();
+    this.robotService.clearPlot(parseInt(this.idPlot));
     this.myChart.update();
   }
 
