@@ -85,7 +85,10 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       stiff: 0,
       damp: 0,
       fault: 0,
-      aux : 0
+      aux : 0,
+      refPos: 0,
+      refVel: 0,
+      refTor: 0
     }
 
     private robotSensorState = {
@@ -114,6 +117,12 @@ export class CanvasComponent implements OnInit, AfterViewInit {
           if (item != null)
             this.robotState = item;
         }
+
+        this.robotService.selectJointName = this.selectJoint;
+        if(this.isJoint)
+          this.robotService.selectJointId = this.robotState.id;
+        else
+          this.robotService.selectJointId = this.robotSensorState.id;
 
         if (this.robotSensor!= null && this.selectedObject != null){
           var userdata = this.selectedObject.userData;
@@ -300,6 +309,10 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
     addPlot(id, topic, name){
       this.robotService.addPlot(1,id,topic,name);
+    }
+
+    plotState(id, name){
+      this.robotService.plotState(id,name);
     }
 
     setVelRef(param: number){

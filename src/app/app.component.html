@@ -6,21 +6,37 @@
 <mat-tab-group >
     <mat-tab  label="Monitoring">
         <div class="containerModelPlot"
-        fxLayout
+        fxLayout ="row"
         fxLayout.xs="column"
-        fxLayoutAlign="center"
-        fxLayoutGap="10px"
+        fxLayoutAlign="left"
+        fxLayoutGap="50px"
         fxLayoutGap.xs="0">
       <div class="item item-1" fxFlex="50%">
           <app-canvas></app-canvas>
       </div>
-      <div class="item item-2" fxFlex="25%">
+      <div class="item item-2" fxFlex="50%">
         <app-plotter idPlot="1" ></app-plotter>
       </div>
-      <div class="item item-3" fxFlex="25%">
-        <app-plotter idPlot="2" ></app-plotter>
+     
       </div>
+
+      <div
+      fxLayout ="row"
+      fxLayout.xs="column"
+      fxLayoutAlign="center"
+      fxLayoutGap="30px"
+      fxLayoutGap.xs="0">
+      <div class="item item-1" fxFlex="33%">
+        <app-plotter idPlot="2" label="Position" [fields]="['motorPos','linkPos','refPos']"></app-plotter>
       </div>
+      <div class="item item-2" fxFlex="33%" >
+        <app-plotter idPlot="3" [fields]="['motorVel','linkVel','refVel']"></app-plotter>
+      </div>
+   
+      <div class="item item-3" fxFlex="34%">
+        <app-plotter idPlot="4"  [fields]="['effort','refTor']"></app-plotter>
+      </div>
+    </div>
       
     </mat-tab>
     <mat-tab label="Plugins">

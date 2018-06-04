@@ -33,6 +33,7 @@ var WS_URL;
 export class PlotterComponent implements AfterViewInit{
 
   @Input() idPlot: string;
+  @Input() fields: Array<string>;
 
   canvas: any;
   ctx: any;
@@ -127,7 +128,7 @@ export class PlotterComponent implements AfterViewInit{
 			}
     });
 
-    this.robotService.registerPlotterComponent(parseInt(this.idPlot));
+    this.robotService.registerPlotterComponent(parseInt(this.idPlot), this.fields);
     this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
       
       if(msg == null)return;
@@ -154,6 +155,11 @@ export class PlotterComponent implements AfterViewInit{
       var i = this.data.datasets.length -1;
       this.map.set(id,i);
       //console.log("ADD plot at "+ "pos "+i+" name "+name);
+    });
+
+    this.robotService.currentClearmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
+      if(msg == null)return;
+      this.clearData();
     });
   }
 

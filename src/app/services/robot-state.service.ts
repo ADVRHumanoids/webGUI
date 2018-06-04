@@ -33,12 +33,16 @@ export class RobotStateService {
   currentmsg = this.parsedMsg.asObservable();
   private plotMap = new Map<number, Map<string,string> >();
   private plotArrayMap = new Map<number, Array<any> >();
+  private topicPlotMap = new Map<number, Array<string> >();
 
   private plotAddMsg = new Map<number, BehaviorSubject<any> >();
   public currentPlotAddmsg = new Map<number,Observable<any> >();
   private plotAddDataMsg = new Map<number, BehaviorSubject<any> >();
   public currentPlotAddDatamsg = new Map<number,Observable<any> >();
-  
+  private plotClearMsg = new Map<number, BehaviorSubject<any> >();
+  public currentClearmsg = new Map<number,Observable<any> >();
+  public selectJointName = "";
+  public selectJointId = 0;
 
   constructor(private wsService: WebsocketService) { 
 
@@ -60,13 +64,19 @@ export class RobotStateService {
     this.parsedMsg.next(msg);
   }
 
-  registerPlotterComponent(id){
+  registerPlotterComponent(id, fields){
 
     this.plotAddDataMsg.set(id,new BehaviorSubject<any>({}));
     this.currentPlotAddDatamsg.set(id,this.plotAddDataMsg.get(id).asObservable());
  
     this.plotAddMsg.set(id,new BehaviorSubject<any>({}));
     this.currentPlotAddmsg.set(id,this.plotAddMsg.get(id).asObservable());
+
+    this.plotClearMsg.set(id,new BehaviorSubject<any>({}));
+    this.currentClearmsg.set(id,this.plotClearMsg.get(id).asObservable());
+
+    if (fields != null)
+      this.topicPlotMap.set(id,fields);
   }
 
   parseMsg(msg){
@@ -84,6 +94,9 @@ export class RobotStateService {
       var stiffs = robot["stiffness"];
       var damps = robot["damping"];
       var faults = robot["fault"];
+      var posrefs = robot["pos_ref"];
+      var velrefs = robot["vel_ref"];
+      var torrefs = robot["eff_ref"];
       var auxs = robot["aux"];
 
       for (let i = 0; i < nameList.length ; i++) {
@@ -99,7 +112,10 @@ export class RobotStateService {
           stiff: stiffs[i],
           damp: damps[i],
           fault: faults[i],
-          aux: auxs[i]
+          aux: auxs[i],
+          refPos: posrefs[i],
+          refVel: velrefs[i],
+          refTor: torrefs[i]
         };
         this.robot.set(nameList[i], obj);
         var keys =  Object.keys(obj);
@@ -209,9 +225,21 @@ export class RobotStateService {
     addMsgItem.next(obj);
   }
 
+  plotState(id, name){
+    this.topicPlotMap.forEach((value: Array<string>, key: number) => {
+      var clearItem = this.plotClearMsg.get(key);
+      if(clearItem != null) clearItem.next({});
+      for (let t of value){
+        this.addPlot(key,id,t,name);
+      }
+    });
+  }
+
   clearPlot(idPlot){
     var array = this.plotArrayMap.get(idPlot);
-    this.plotMap.get(idPlot).clear();
+    var tmp = this.plotMap.get(idPlot)
+    if (tmp!= null)
+      tmp.clear();
     this.plotArrayMap.set(idPlot,[]);
   }
 
