@@ -184,7 +184,7 @@ export class RobotStateService {
             for (let key of keys){
               var topic = value.get(ids[i]+"/"+key);
               if (topic != null){
-                var pobj = {"name": ids[i]+"/"+key , "value": obj[topic]};
+                var pobj = {"name": ids[i]+"/"+key , "value": objs[topic]};
                 var array = this.plotArrayMap.get(mkey);
                 if( array != null)
                   array.push(pobj);
