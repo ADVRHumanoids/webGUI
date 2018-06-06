@@ -393,7 +393,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     ngAfterViewInit() {
 
       this.container.style.width = "100%";
-      this.container.style.height = "50%";
+      this.container.style.height = "100%";
 
       this.camera.aspect = this.getAspectRatio();
       this.camera.updateProjectionMatrix();
@@ -421,8 +421,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     @HostListener('window:resize', ['$event'])
     public onResize(event: Event) {
         this.container.style.width = "100%";
-        this.container.style.height = "50%";
-        console.log("onResize: " + this.container.clientWidth + ", " + this.container.clientHeight);
+        this.container.style.height = "100%";
+        //console.log("onResize: " + this.container.clientWidth + ", " + this.container.clientHeight);
 
         this.camera.aspect = this.getAspectRatio();
         this.camera.updateProjectionMatrix();

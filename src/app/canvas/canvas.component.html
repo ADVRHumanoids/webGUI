@@ -1,6 +1,7 @@
+<div >
 <div class="canvas" #container></div>
 
-<div *ngIf="isJoint;else sensor">
+<div  *ngIf="isJoint;else sensor">
 <mat-card class="example-card">
 <mat-card-header>
     <mat-card-title>ID: {{robotState.id}}  Name: {{robotState.name}} <button  mat-raised-button color="primary" type="button" (click)="plotState(robotState.id,robotState.name)">PlotState</button></mat-card-title>
@@ -22,7 +23,7 @@
 </mat-card>
 
 </div>
-      
+</div>
 
 <ng-template #sensor>
 <mat-card class="example-card">

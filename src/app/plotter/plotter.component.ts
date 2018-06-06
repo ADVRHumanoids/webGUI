@@ -33,12 +33,14 @@ var WS_URL;
 export class PlotterComponent implements AfterViewInit{
 
   @Input() idPlot: string;
+  @Input() label: string;
   @Input() fields: Array<string>;
 
   canvas: any;
   ctx: any;
   private data : any;
   private myChart: any;
+  private isResponsive: boolean;
   private robotService: RobotStateService;
   private samples: number;
   private delete: boolean;
@@ -57,7 +59,8 @@ export class PlotterComponent implements AfterViewInit{
   constructor(robotService: RobotStateService) {
     this.robotService = robotService;
     this.isfrozen = false;
-    this.samples = 500;
+    this.samples = 100;
+    if( this.label == null) this.label = "Plotter";
     this.data = {
       labels: [],
       datasets: []
@@ -83,18 +86,32 @@ export class PlotterComponent implements AfterViewInit{
   ngAfterViewInit() {
 
     console.log("PLOTTER ID "+this.idPlot);
+    if( parseInt(this.idPlot) == 1) 
+      this.isResponsive = false;
+    else 
+      this.isResponsive = true;
     this.canvas = document.getElementById(this.getId());
     this.ctx = this.canvas.getContext('2d');
     this.myChart = new Chart(this.ctx, {
       type: 'line',
       data: this.data,
       options: {
-        responsive: false,
+        responsiveAnimationDuration:0,
+        elements:{
+          line:{
+            tension: 0
+          }
+        },
+        animation:{
+          duration: 0
+        },
+        responsive: this.isResponsive,
+        maintainAspectRation: false,
         steppedLine: true,
         //cubicInterpolationMode: "",
 				title: {
 					display: true,
-					text: 'Plotter'
+					text: this.label
 				},
 				tooltips: {
           enabled: false,
@@ -104,13 +121,21 @@ export class PlotterComponent implements AfterViewInit{
 				/*hover: {
 					mode: 'nearest',
 					intersect: true
-				},*/
+        },*/
+        ticks:{
+          source: 'labels'
+        },
 				scales: {
 					xAxes: [{
-						display: false,
+            display: false,
+            type: 'time',
+            distribution: 'series',
+            time:{
+              unit: 'second'
+            },
 						scaleLabel: {
 							display: true,
-							//labelString: 'Time'
+							labelString: 'Time'
 						}
 					}],
 					yAxes: [{
@@ -133,7 +158,7 @@ export class PlotterComponent implements AfterViewInit{
       
       if(msg == null)return;
       if (this.isfrozen)return;
-      this.data.labels.push(new Date().getTime());
+      this.data.labels.push(new Date());
       for (let pdata of msg){
         var name = pdata["name"];
         if(name == null) return;
@@ -166,6 +191,11 @@ export class PlotterComponent implements AfterViewInit{
   setScale(val){
 
     this.myChart.options.scales.yAxes[0].ticks.stepSize = val;
+  }
+
+  setSample(val){
+    
+    this.samples = val;
   }
 
   freeze(){

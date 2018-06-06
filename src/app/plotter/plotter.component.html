@@ -1,6 +1,13 @@
+<div>
 <canvas [id]="getId()" width="400" height="400"></canvas>
-<p>
+<div>
 <button mat-raised-button color="primary" type="button" (click)="clearData()">Clear Data</button> 
-<button mat-raised-button color="primary" type="button" (click)="freeze()">Freeze</button> 
-<input [type]="type" #Vel name="range" step="0.1" (change)="setScale(Vel.value)" > 
-</p>
+<button mat-raised-button color="primary" type="button" (click)="freeze()">Freeze</button>
+</div> 
+<div>
+Scale <input [type]="type" #Scale name="range" step="0.1" (change)="setScale(Scale.value)" > 
+</div>
+<div>
+Sample <input [type]="type" #Sample name="range" step="0.1" (change)="setSample(Sample.value)" > 
+</div>
+</div>
