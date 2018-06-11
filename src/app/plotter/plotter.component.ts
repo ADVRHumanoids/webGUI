@@ -127,11 +127,14 @@ export class PlotterComponent implements AfterViewInit{
         },
 				scales: {
 					xAxes: [{
-            display: false,
+            display: true,
             type: 'time',
             distribution: 'series',
             time:{
-              unit: 'second'
+              unit: 'second',
+              displayFormats:{
+                second: 'ss'
+              }
             },
 						scaleLabel: {
 							display: true,

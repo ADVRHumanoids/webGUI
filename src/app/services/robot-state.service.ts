@@ -43,21 +43,34 @@ export class RobotStateService {
   public currentClearmsg = new Map<number,Observable<any> >();
   public selectJointName = "";
   public selectJointId = 0;
+  private interval;
+
+  onError(err){
+    console.log("WebSocket Error occur "+err);
+  }
+
+  onClose(){
+    console.log("WebSocket closed by server");
+  }
+
+  connectWebSocket(){
+    console.log("WebSocket trying connect");
+    clearInterval(this.interval);
+    var ip = window.location.origin;
+    ip = ip.substr(7);
+    var WS_URL = "ws://"+ip+"/websocket";
+    this.wsService.connect(WS_URL);
+  }
 
   constructor(private wsService: WebsocketService) { 
 
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
-
-    var ip = window.location.origin;
-    ip = ip.substr(7);
-    var WS_URL = "ws://"+ip+"/websocket";
-    this.wsService.connect(WS_URL);
+    this.connectWebSocket();   
     this.wsService.messages.subscribe(msg => {		
       this.parseMsg(msg);
       this.sendMsg();
-     });
-
+     },this.onError, this.onClose);
   }
   
   publishMsg(msg){
