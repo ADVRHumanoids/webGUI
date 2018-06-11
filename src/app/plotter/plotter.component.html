@@ -5,9 +5,9 @@
 <button mat-raised-button color="primary" type="button" (click)="freeze()">Freeze</button>
 </div> 
 <div>
-Scale <input [type]="type" #Scale name="range" step="0.1" (change)="setScale(Scale.value)" > 
+Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" > 
 </div>
 <div>
-Sample <input [type]="type" #Sample name="range" step="0.1" (change)="setSample(Sample.value)" > 
+Sample <input #Sample name="range" step="0.1" (change)="setSample(Sample.value)" > 
 </div>
 </div>

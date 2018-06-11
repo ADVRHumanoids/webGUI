@@ -71,7 +71,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     private isModelLoaded: boolean;
     private selectJoint: string;
     private selectMaterial: any;
-    private isJoint = true;
+    public isJoint = true;
 
     private robotState = {
       name: "",
@@ -105,7 +105,8 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
       this.isModelLoaded = true;
-      this.service = new HttpService("/model",http);
+      this.service = new HttpService(http);
+      this.service.setURL("/model");
       this.robotService = robotService;
       this.robot = new Map<string, any>();
       this.robotSensor = new Map<string, any>();

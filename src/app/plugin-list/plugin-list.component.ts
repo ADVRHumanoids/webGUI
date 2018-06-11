@@ -33,11 +33,12 @@ import { NotFoundError } from './../common/not-foud-error';
 export class PluginListComponent implements OnInit {
 
   private service;
-  private plugins = [];
+  public plugins = [];
 
   constructor(http: HttpClient) { 
     
-    this.service = new HttpService("/plugins",http);
+    this.service = new HttpService(http);
+    this.service.setURL("/plugins");
   }
 
   ngOnInit() {

@@ -30,9 +30,9 @@ import { Component, OnInit, NgModule } from '@angular/core';
 })
 export class SliderControlComponent implements OnInit {
 
-  private type = "range";
+  public type = "range";
   private service;
-  private chains = [];
+  public chains = [];
   private jid = [];
   private jval = [];
   private evval = [];
@@ -51,7 +51,8 @@ export class SliderControlComponent implements OnInit {
 
  constructor(http: HttpClient) { 
     
-    this.service = new HttpService("/singlejoint",http);
+    this.service = new HttpService(http);
+    this.service.setURL("/singlejoint");
   }
 
   ngOnInit() {

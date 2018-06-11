@@ -17,21 +17,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
 */
 
-import {throwError as observableThrowError, Observable} from 'rxjs';
 import { Injectable } from '@angular/core';
 import { NotFoundError } from './../common/not-foud-error';
 import { AppError } from './../common/app-error';
 //import { Http, RequestOptions, Headers } from '@angular/http';
 import { HttpClient } from '@angular/common/http';
-
-//import 'rxjs//add/observable/throw';
-
+//import {throwError as observableThrowError, Observable} from 'rxjs';
 
 @Injectable()
 export class HttpService {
 
-  constructor(private url: string,private http: HttpClient) { }
+  private url: string;
 
+  constructor(private http: HttpClient) { }
+
+  setURL(url){
+    this.url = url;
+  }
 
   getAll(){
 
@@ -84,11 +86,11 @@ export class HttpService {
       
     }
 
-    private handleError(error: Response){
+    /*private handleError(error: Response){
 
        if(error.status === 404)
           return observableThrowError(new NotFoundError());
 
       return observableThrowError(new AppError(error));
-    }
+    }*/
 }
