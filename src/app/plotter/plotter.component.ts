@@ -86,10 +86,10 @@ export class PlotterComponent implements AfterViewInit{
   ngAfterViewInit() {
 
     console.log("PLOTTER ID "+this.idPlot);
-    if( parseInt(this.idPlot) == 1) 
-      this.isResponsive = false;
-    else 
-      this.isResponsive = true;
+    //if( parseInt(this.idPlot) == 1) 
+    //  this.isResponsive = false;
+    //else 
+    this.isResponsive = true;
     this.canvas = document.getElementById(this.getId());
     this.ctx = this.canvas.getContext('2d');
     this.myChart = new Chart(this.ctx, {
@@ -127,7 +127,7 @@ export class PlotterComponent implements AfterViewInit{
         },
 				scales: {
 					xAxes: [{
-            display: true,
+            display: false,
             type: 'time',
             distribution: 'series',
             time:{
@@ -137,7 +137,7 @@ export class PlotterComponent implements AfterViewInit{
               }
             },
 						scaleLabel: {
-							display: true,
+							display: false,
 							labelString: 'Time'
 						}
 					}],

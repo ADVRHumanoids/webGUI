@@ -3,9 +3,9 @@
 <mat-toolbar color="primary">
     <span>ROBOT WEB GUI</span>
 </mat-toolbar>
-<mat-tab-group >
-    <mat-tab  label="Monitoring">
-        <div class="containerModelPlot"
+<mat-tab-group style="width:100%; height:100%">
+    <mat-tab style="width:100%; height:100%" label="Monitoring">
+       <!-- <div class="containerModelPlot"
         fxLayout ="row"
         fxLayout.xs="column"
         fxLayoutAlign="left"
@@ -37,7 +37,107 @@
         <app-plotter idPlot="4" label="Torque"  [fields]="['effort','refTor']"></app-plotter>
       </div>
     </div>
+  -->  
+
+
+      <div style="width:100%; height:100%" class="containerModelPlot"
+      fxLayout ="column"
+      fxLayout.xs="column"
+      fxLayoutAlign="center stretch"
+      fxLayoutGap="5px"
+      fxLayoutGap.xs="0">
+        <div class="item item-1"  fxFlex="90" >
+         <div style="height:100%">
+             
+            <div style="width:100%; height:100%"
+            fxLayout ="row"
+            fxLayout.xs="column"
+            fxLayoutAlign="center stretch"
+            fxLayoutGap="5px"
+            fxLayoutGap.xs="0">
+              <div class="item item-1"  fxFlex="20" >
+               <div style="background-color: orange; height:100%">
+                 col1
+              </div> 
+              </div>
+              <div class="item item-2"  fxFlex="40" >
+                  <div style="width:100%; height:100%"
+                  fxLayout ="column"
+                  fxLayout.xs="column"
+                  fxLayoutAlign="center stretch"
+                  fxLayoutGap="2px"
+                  fxLayoutGap.xs="0">
+                    <div class="item item-1"  fxFlex="5" >
+                     <div style="background-color: orange; height:100%">
+                       row1
+                    </div> 
+                    </div>
+                    <div class="item item-2"  fxFlex="47" >
+                      <div style=" height:100%">
+                          <app-plotter idPlot="2" label="Position" [fields]="['motorPos','linkPos','refPos']"></app-plotter></div> 
+                    </div>
+                    <div class="item item-3"  fxFlex="48" >
+                        <div style=" height:100%">
+                            <app-plotter idPlot="3" label="Velocity"  [fields]="['motorVel','linkVel','refVel']"></app-plotter> 
+                        </div> 
+                      </div>
+            
+                  </div>
+              
+              </div>
+              <div class="item item-3"  fxFlex="40" >
+                  <div style="height:100%"> 
+                    <div style="width:100%; height:100%"
+                    fxLayout ="column"
+                    fxLayout.xs="column"
+                    fxLayoutAlign="center stretch"
+                    fxLayoutGap="2px"
+                    fxLayoutGap.xs="0">
+                    <!--2 PLOT view-->
+                      <!--<div class="item item-1"  fxFlex="50" >
+                       <div style=" height:100%">
+                          <app-plotter idPlot="1" ></app-plotter>
+                      </div> 
+                      </div>
+                      <div class="item item-2"  fxFlex="50" >
+                          <app-plotter idPlot="4" label="Torque"  [fields]="['effort','refTor']"></app-plotter> 
+                      </div>
+                    </div>
+                  -->
+                  <!--PLOT view-->
+
+                <!--  <div class="item item-1"  fxFlex="calc2Cols" >
+                      <div style="background-color: orange; height:100%">
+                         <app-plotter idPlot="1" ></app-plotter>
+                     </div> 
+                  </div>
+                </div>-->
+
+                  <!--MODEL view-->
+                  <div class="item item-1"  fxFlex="calc2Cols" >
+                      <div style="background-color: orange; height:100%">
+                          <app-canvas></app-canvas>
+                     </div> 
+                  </div>
+                </div>
+
+
+
+
+                    </div> 
+                </div>
       
+            </div>
+        
+        </div> 
+        </div>
+        <div class="item item-2"  fxFlex="10" >
+          <div style="background-color: red; height:100%">item2</div> 
+        </div>
+
+      </div>
+
+
     </mat-tab>
     <mat-tab label="Plugins">
       <app-plugin-list></app-plugin-list>
