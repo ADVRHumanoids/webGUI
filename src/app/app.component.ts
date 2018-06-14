@@ -30,6 +30,28 @@ import { Component} from '@angular/core';
 })
 export class AppComponent {
   
+  public modelViewFlag = true;
+  public plotterViewFlag = false;
+  public allPlotsViewFlag = false;
+
+  changeView(param){
+    //console.log("enableModelView"+ param);
+    if (param == "Model"){
+      this.modelViewFlag = true;
+      this.plotterViewFlag = false;
+      this.allPlotsViewFlag = false;
+    }
+    else if (param == "Plotter"){
+      this.plotterViewFlag = true;
+      this.modelViewFlag = false;
+      this.allPlotsViewFlag = false;
+    }
+    else if (param == "AllPlots"){
+      this.plotterViewFlag = false;
+      this.allPlotsViewFlag = true;
+      this.modelViewFlag = false;
+    }
+  }
 
 }
 

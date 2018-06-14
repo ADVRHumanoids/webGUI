@@ -42,7 +42,7 @@ import { RobotStateService } from './../services/robot-state.service';
   styleUrls: ['./canvas.component.css']
 })
 export class CanvasComponent implements OnInit, AfterViewInit {
-
+ 
   title = 'app';
   
     @ViewChild('container') elementRef: ElementRef;
@@ -390,15 +390,22 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       this.container.appendChild(this.renderer.domElement);
       this.render();
     }
-  
-    ngAfterViewInit() {
 
+    resize(){
       this.container.style.width = "100%";
       this.container.style.height = "100%";
+      //console.log("onResize: " + this.container.clientWidth + ", " + this.container.clientHeight);
 
       this.camera.aspect = this.getAspectRatio();
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    }
+  
+    ngAfterViewInit() {
+      console.log("ngAfterViewInit");
+      setTimeout(()=>{ 
+        this.resize();
+      },100);
     }
 
     @HostListener('document:mousedown', ['$event'])
@@ -421,13 +428,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
 
     @HostListener('window:resize', ['$event'])
     public onResize(event: Event) {
-        this.container.style.width = "100%";
-        this.container.style.height = "100%";
-        //console.log("onResize: " + this.container.clientWidth + ", " + this.container.clientHeight);
-
-        this.camera.aspect = this.getAspectRatio();
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.resize();
         this.render();
     }
 

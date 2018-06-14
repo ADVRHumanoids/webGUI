@@ -1,6 +1,6 @@
-<div style=" height:100%;" >
+<!--<div style=" height:100%;" >
         <canvas [id]="getId()"></canvas>
-<!--<div>
+<div>
 <button mat-raised-button color="primary" type="button" (click)="clearData()">Clear Data</button> 
 <button mat-raised-button color="primary" type="button" (click)="freeze()">Freeze</button>
 </div> 
@@ -9,5 +9,32 @@ Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" >
 </div>
 <div>
 Sample <input #Sample name="range" step="0.1" (change)="setSample(Sample.value)" > 
-</div>-->
 </div>
+</div>
+-->
+
+
+
+
+          <div style="width:100%; height:100%"
+          fxLayout ="column"
+          fxLayout.xs="column"
+          fxLayoutAlign="center stretch"
+          fxLayoutGap="2px"
+          fxLayoutGap.xs="0">
+            <div class="item item-1"  fxFlex="80" >
+             <div style=" height:100%">
+                    <canvas [id]="getId()"></canvas>
+            </div> 
+            </div>
+            <div class="item item-2"  fxFlex="20" >
+              <div style=" height:100%">
+                    <div >
+                    <button mat-raised-button color="primary" type="button" (click)="clearData()">Clear</button> 
+                    <button mat-raised-button color="primary" type="button" (click)="freeze()">Pause</button>
+                    Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" style=" width:50px" > 
+                    Sample <input #Sample name="range" step="0.1" (change)="setSample(Sample.value)" style=" width:50px"> 
+                    </div> 
+             </div>
+            </div>
+          </div>
