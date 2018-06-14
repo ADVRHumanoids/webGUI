@@ -106,7 +106,7 @@ export class PlotterComponent implements AfterViewInit{
           duration: 0
         },
         responsive: this.isResponsive,
-        maintainAspectRation: false,
+        maintainAspectRatio: false,
         steppedLine: true,
         //cubicInterpolationMode: "",
 				title: {
