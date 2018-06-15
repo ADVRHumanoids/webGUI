@@ -127,7 +127,7 @@ export class PlotterComponent implements AfterViewInit{
         },
 				scales: {
 					xAxes: [{
-            display: true,
+            display: false,
             type: 'time',
             distribution: 'series',
             time:{
@@ -137,7 +137,7 @@ export class PlotterComponent implements AfterViewInit{
               }
             },
 						scaleLabel: {
-							display: true,
+							display: false,
 							labelString: 'Time'
 						}
 					}],
