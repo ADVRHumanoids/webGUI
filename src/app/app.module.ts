@@ -32,6 +32,8 @@ import { SliderControlComponent } from './slider-control/slider-control.componen
 import { FormsModule } from '@angular/forms';
 import { CanvasComponent } from './canvas/canvas.component';
 import { PlotterComponent } from './plotter/plotter.component';
+import {ControlPanelComponent } from './control-panel/control-panel.component';
+import {TreePanelComponent } from './tree-panel/tree-panel.component';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatToolbarModule} from '@angular/material';
@@ -44,7 +46,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import { ControlPanelComponent } from './control-panel/control-panel.component';
+import {MatTreeModule} from '@angular/material/tree';
 
 @NgModule({
   declarations: [
@@ -53,7 +55,8 @@ import { ControlPanelComponent } from './control-panel/control-panel.component';
     SliderControlComponent,
     CanvasComponent,
     PlotterComponent,
-    ControlPanelComponent
+    ControlPanelComponent,
+    TreePanelComponent
   ],
   imports: [
     BrowserModule,
@@ -69,7 +72,8 @@ import { ControlPanelComponent } from './control-panel/control-panel.component';
     MatButtonModule,
     MatTabsModule,
     MatIconModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatTreeModule
   ],
   providers: [
      HttpService,

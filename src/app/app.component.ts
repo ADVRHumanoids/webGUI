@@ -1,4 +1,3 @@
-import { ControlPanelComponent } from './control-panel/control-panel.component';
 /*
  * Copyright (C) 2017 IIT-ADVR
  * Author:  Giuseppe Rigano
@@ -22,6 +21,8 @@ import { PlotterComponent } from './plotter/plotter.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { SliderControlComponent } from './slider-control/slider-control.component';
 import { PluginListComponent } from './plugin-list/plugin-list.component';
+import { ControlPanelComponent } from './control-panel/control-panel.component';
+import { TreePanelComponent } from './tree-panel/tree-panel.component';
 import { Component} from '@angular/core';
 
 @Component({
