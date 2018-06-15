@@ -66,14 +66,12 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     private vval: number;
     private service;
     private robotService: RobotStateService;
-    private robot: Map<string, any>;
-    private robotSensor: Map<string, any>;
+    /*private robot: Map<string, any>;
+    private robotSensor: Map<string, any>;*/
     private isModelLoaded: boolean;
-    private selectJoint: string;
     private selectMaterial: any;
-    public isJoint = true;
 
-    private robotState = {
+    /*private robotState = {
       name: "",
       id: 0,
       motorPos: 0,
@@ -100,7 +98,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       torquex: 0,
       torquey: 0,
       torquez: 0,
-    }
+    }*/
 
     constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
@@ -108,7 +106,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       this.service = new HttpService(http);
       this.service.setURL("/model");
       this.robotService = robotService;
-      this.robot = new Map<string, any>();
+     /* this.robot = new Map<string, any>();
       this.robotSensor = new Map<string, any>();
       this.robotService.currentmsg.subscribe(msg => {	
         this.robot = msg["robot"];
@@ -124,6 +122,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
           this.robotService.selectJointId = this.robotState.id;
         else
           this.robotService.selectJointId = this.robotSensorState.id;
+          
 
         if (this.robotSensor!= null && this.selectedObject != null){
           var userdata = this.selectedObject.userData;
@@ -135,10 +134,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
           }
         }
         
-    });
+    });*/
     }
-  
-   
+    
     createNodeLink(pos,rot_axis,angle,scale){
       
       var tmp = new THREE.Mesh();
@@ -308,14 +306,6 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       return cube;
     }
 
-    addPlot(id, topic, name){
-      this.robotService.addPlot(1,id,topic,name);
-    }
-
-    plotState(id, name){
-      this.robotService.plotState(id,name);
-    }
-
     setVelRef(param: number){
       
      this.vval = param;
@@ -325,7 +315,6 @@ export class CanvasComponent implements OnInit, AfterViewInit {
         var axis = userdata["axis"];
         //this.selectedObject.setRotationFromAxisAngle(new THREE.Vector3(axis[0],axis[1],axis[2]),param);
      }*/
-     this.isModelLoaded = true;
     }
   
     loadMesh(geometry, id){
@@ -455,12 +444,19 @@ export class CanvasComponent implements OnInit, AfterViewInit {
         //console.log(this.selectedObject);
         var userdata = this.selectedObject.parent.userData;
         if (userdata != null){
-          if (this.jointmap.get(userdata["name"])!= null) this.isJoint = true;
-          this.selectJoint = userdata["name"];
+          if (this.jointmap.get(userdata["name"])!= null)
+          {                          
+            this.robotService.isJoint = true;
+            this.robotService.selectJointSensorName = userdata["name"];
+          }
         }
         var userdata = this.selectedObject.userData;
         if (userdata != null){
-          if (this.robotSensor.get(userdata["name"])!= null) this.isJoint = false;
+            var sensor = userdata["name"];
+            if(sensor != null){
+              this.robotService.isJoint = false;
+              this.robotService.selectJointSensorName = sensor;
+            }
         }
     }
   }

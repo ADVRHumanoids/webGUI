@@ -37,7 +37,7 @@
                 fxLayoutAlign="center stretch"
                 fxLayoutGap="2px"
                 fxLayoutGap.xs="0">
-                  <div  *ngIf="allPlotsViewFlag; then LeftPlotView"></div>
+                  <div  *ngIf="allPlotsViewFlag; then LeftPlotView else controlPanelView"></div>
                 </div>
             </div>
             <div class="item item-3"  fxFlex="40" >
@@ -71,6 +71,13 @@
 <!--<app-slider-control></app-slider-control>-->
 
 
+<ng-template #controlPanelView>
+    <div class="item item-1"  fxFlexFill >
+        <div style="height:100%;">
+            <app-control-panel></app-control-panel>
+        </div> 
+    </div>
+  </ng-template>
   
 <ng-template #plotterView>
   <div class="item item-1"  fxFlexFill >

@@ -44,6 +44,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { ControlPanelComponent } from './control-panel/control-panel.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
     PluginListComponent,
     SliderControlComponent,
     CanvasComponent,
-    PlotterComponent
+    PlotterComponent,
+    ControlPanelComponent
   ],
   imports: [
     BrowserModule,

@@ -1,3 +1,4 @@
+import { ControlPanelComponent } from './control-panel/control-panel.component';
 /*
  * Copyright (C) 2017 IIT-ADVR
  * Author:  Giuseppe Rigano

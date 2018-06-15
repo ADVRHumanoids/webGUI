@@ -41,9 +41,10 @@ export class RobotStateService {
   public currentPlotAddDatamsg = new Map<number,Observable<any> >();
   private plotClearMsg = new Map<number, BehaviorSubject<any> >();
   public currentClearmsg = new Map<number,Observable<any> >();
-  public selectJointName = "";
-  public selectJointId = 0;
+  public selectJointSensorName = "";
+  public selectJointSensorId = 0;
   private interval;
+  public isJoint = true;
 
   onError(err){
     console.log("WebSocket Error occur "+err);
