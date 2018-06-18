@@ -4,12 +4,12 @@ fxLayout.xs="column"
 fxLayoutAlign="center stretch"
 fxLayoutGap="5px"
 fxLayoutGap.xs="0">
-    <div class="item item-2"  fxFlex="95">
+    <div class="item item-2"  fxFlex="90">
         <div style=" height:100%; overflow: scroll;">
             <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
                 <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
                   <button mat-icon-button disabled></button>
-                  {{node.devicename}} : {{node.type}}
+                  <button (click)="setActiveDevice(node.type, node.isJoint)" mat-button>{{node.devicename}} : {{node.type}}</button>
                 </mat-tree-node>
               
                 <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
@@ -19,15 +19,15 @@ fxLayoutGap.xs="0">
                       {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                   </button>
-                  {{node.devicename}} : {{node.type}}
+                  <button (click)="setActiveDevice(node.type,node.isJoint)" mat-button>{{node.devicename}} : {{node.type}}</button>
                 </mat-tree-node>
             </mat-tree>
         </div> 
     </div>
-    <div class="item item-3"  fxFlex="5" >
+    <div class="item item-3"  fxFlex="10" >
         <div style=" height:100%">
             <div style="background-color: orange; height:100%">
-                    row1
+                   {{selectedDevice}} <button  *ngIf="isJoint" mat-raised-button color="primary" type="button" (click)="plotState(jointId,selectedDevice)">PlotState</button>
             </div> 
         </div> 
     </div>

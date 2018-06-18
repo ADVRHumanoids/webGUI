@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
 */
 
-import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input,AfterViewInit} from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input,AfterViewInit, OnDestroy} from '@angular/core';
 import * as THREE from 'three';
 import { HttpService } from './../services/http.service';
 import { HttpClient } from '@angular/common/http';
@@ -41,7 +41,7 @@ import { RobotStateService } from './../services/robot-state.service';
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.css']
 })
-export class CanvasComponent implements OnInit, AfterViewInit {
+export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
  
   title = 'app';
   
@@ -70,6 +70,7 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     private robotSensor: Map<string, any>;*/
     private isModelLoaded: boolean;
     private selectMaterial: any;
+    private idAnimationFrame;
 
     /*private robotState = {
       name: "",
@@ -397,6 +398,22 @@ export class CanvasComponent implements OnInit, AfterViewInit {
       },100);
     }
 
+    ngOnDestroy() {
+     
+      cancelAnimationFrame(this.idAnimationFrame);
+      this.idAnimationFrame = null;
+      this.robotService = null;
+      this.linkmap = null;
+      this.jointmap = null;
+      this.service = null;
+      this.scene = null;
+      this.camera = null;
+      this.controls = null;
+      this.container = null;
+      
+      //REMOVE HOSTLISTENER
+    }
+   
     @HostListener('document:mousedown', ['$event'])
     checkIntersection (event: MouseEvent) {
       var rect = this.renderer.domElement.getBoundingClientRect();
@@ -424,10 +441,9 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     render(){
       let self: CanvasComponent = this;
       (function render(){
-        requestAnimationFrame(render);
+        self.idAnimationFrame = requestAnimationFrame(render);
         self.renderer.render(self.scene, self.camera);
       }());
-      
     }
   
     CheckIntersection () {

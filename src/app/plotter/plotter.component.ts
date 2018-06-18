@@ -17,9 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
 */
 
-import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, OnDestroy } from '@angular/core';
 import * as Chart from 'chart.js';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject} from 'rxjs';
+import { Subscription} from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
 var WS_URL;
@@ -30,7 +31,7 @@ var WS_URL;
   styleUrls: ['./plotter.component.css']
 })
 
-export class PlotterComponent implements AfterViewInit{
+export class PlotterComponent implements AfterViewInit, OnDestroy{
 
   @Input() idPlot: string;
   @Input() label: string;
@@ -46,6 +47,11 @@ export class PlotterComponent implements AfterViewInit{
   private delete: boolean;
   private isfrozen: boolean;
   private map: Map<string, number>;
+  private subPlotAddDatamsg : Subscription;
+  private subPlotAddmsg : Subscription;
+  private subPlotClearmsg : Subscription;
+  private interval;
+
   private chartColors = {
     red: 'rgb(255, 99, 132)',
     orange: 'rgb(255, 159, 64)',
@@ -67,7 +73,7 @@ export class PlotterComponent implements AfterViewInit{
     };
     this.map = new Map<string, number> ();
 
-    setInterval(()=>{ 
+    this.interval = setInterval(()=>{ 
       if (this.isfrozen)return;
       if(this.data.labels.length > this.samples)
         this.data.labels.splice(0, 1);
@@ -157,7 +163,7 @@ export class PlotterComponent implements AfterViewInit{
     });
 
     this.robotService.registerPlotterComponent(parseInt(this.idPlot), this.fields);
-    this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
+    this.subPlotAddDatamsg = this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
       
       if(msg == null)return;
       if (this.isfrozen)return;
@@ -173,7 +179,7 @@ export class PlotterComponent implements AfterViewInit{
       }
     });
 
-    this.robotService.currentPlotAddmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
+    this.subPlotAddmsg = this.robotService.currentPlotAddmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
       if(msg == null)return;
       var topic = msg["topic"];
       if( topic == null) return;
@@ -185,11 +191,24 @@ export class PlotterComponent implements AfterViewInit{
       //console.log("ADD plot at "+ "pos "+i+" name "+name);
     });
 
-    this.robotService.currentClearmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
+    this.subPlotClearmsg = this.robotService.currentClearmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
       if(msg == null)return;
       this.clearData();
     });
   }
+
+  ngOnDestroy() {
+
+    this.subPlotAddDatamsg.unsubscribe();
+    this.subPlotAddmsg.unsubscribe();
+    this.subPlotClearmsg.unsubscribe();
+    clearInterval(this.interval);
+    this.robotService = null;
+    this.map = null;
+     
+     //REMOVE HOSTLISTENER
+     //REMOVE SETINTERVAL
+   }
 
   setScale(val){
 

@@ -93,6 +93,11 @@ export class RobotStateService {
       this.topicPlotMap.set(id,fields);
   }
 
+  getJointId(param){
+    var obj = this.robot.get(param);
+    return obj.id;
+  }
+
   parseMsg(msg){
     
     var robot = msg["Robot"];

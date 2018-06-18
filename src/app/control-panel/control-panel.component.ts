@@ -1,13 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RobotStateService } from './../services/robot-state.service';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-control-panel',
   templateUrl: './control-panel.component.html',
   styleUrls: ['./control-panel.component.css']
 })
-export class ControlPanelComponent implements OnInit {
+export class ControlPanelComponent implements OnInit, OnDestroy {
+  
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+    this.robot = null;
+    this.robotService = null;
+    this.robotSensor = null;
+  }
+
+  private sub : Subscription;
 
   private robotState = {
     name: "",
@@ -47,7 +56,7 @@ export class ControlPanelComponent implements OnInit {
     this.robotService = robotService;
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
-    this.robotService.currentmsg.subscribe(msg => {	
+    this.sub = this.robotService.currentmsg.subscribe(msg => {	
       this.robot = msg["robot"];
       this.robotSensor = msg["sensor"];
       if(this.robot != null && this.robotService.isJoint){
@@ -73,9 +82,5 @@ export class ControlPanelComponent implements OnInit {
 
   addPlot(id, topic, name){
     this.robotService.addPlot(0,id,topic,name);
-  }
-
-  plotState(id, name){
-    this.robotService.plotState(id,name);
   }
 }
