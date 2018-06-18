@@ -443,6 +443,24 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       (function render(){
         self.idAnimationFrame = requestAnimationFrame(render);
         self.renderer.render(self.scene, self.camera);
+        if (self.selectedObject != null){
+          (<THREE.Mesh>self.selectedObject).material = self.selectMaterial;
+        }
+        var joint = self.jointmap.get(self.robotService.selectJointSensorName)
+        if (joint!= null) { 
+          self.selectedObject = joint.children[0]; 
+          self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
+          (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
+        }
+        else {
+          var sensor = self.linkmap.get(self.robotService.selectJointSensorName);
+          if(sensor != null){
+            self.selectedObject = sensor; 
+            self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
+            (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
+          }
+        }
+
       }());
     }
   
