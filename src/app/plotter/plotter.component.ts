@@ -23,8 +23,6 @@ import { Observable, Subject, BehaviorSubject} from 'rxjs';
 import { Subscription} from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
-var WS_URL;
-
 @Component({
   selector: 'app-plotter',
   templateUrl: './plotter.component.html',
@@ -91,110 +89,113 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
 
   ngAfterViewInit() {
 
-    console.log("PLOTTER ID "+this.idPlot);
-    //if( parseInt(this.idPlot) == 1) 
-    //  this.isResponsive = false;
-    //else 
-    this.isResponsive = true;
-    this.canvas = document.getElementById(this.getId());
-    this.ctx = this.canvas.getContext('2d');
-    this.myChart = new Chart(this.ctx, {
-      type: 'line',
-      data: this.data,
-      options: {
-        responsiveAnimationDuration:0,
-        elements:{
-          line:{
-            tension: 0
-          }
-        },
-        animation:{
-          duration: 0
-        },
-        responsive: this.isResponsive,
-        maintainAspectRatio: false,
-        steppedLine: true,
-        //cubicInterpolationMode: "",
-				title: {
-					display: true,
-					text: this.label
-				},
-				tooltips: {
-          enabled: false,
-					mode: 'index',
-					intersect: false,
-				},
-				/*hover: {
-					mode: 'nearest',
-					intersect: true
-        },*/
-        ticks:{
-          source: 'labels'
-        },
-				scales: {
-					xAxes: [{
-            display: false,
-            type: 'time',
-            distribution: 'series',
-            time:{
-              unit: 'second',
-              displayFormats:{
-                second: 'ss'
-              }
-            },
-						scaleLabel: {
-							display: false,
-							labelString: 'Time'
-						}
-					}],
-					yAxes: [{
-            beginAtZero: true,
+    setTimeout(()=>{ 
+      console.log("PLOTTER ID "+this.idPlot);
+      //if( parseInt(this.idPlot) == 1) 
+      //  this.isResponsive = false;
+      //else 
+      this.isResponsive = true;
+      this.canvas = document.getElementById(this.getId());
+      this.ctx = this.canvas.getContext('2d');
+      this.myChart = new Chart(this.ctx, {
+        type: 'line',
+        data: this.data,
+        options: {
+          responsiveAnimationDuration:0,
+          elements:{
+            line:{
+              tension: 0
+            }
+          },
+          animation:{
+            duration: 0
+          },
+          responsive: this.isResponsive,
+          maintainAspectRatio: false,
+          steppedLine: true,
+          //cubicInterpolationMode: "",
+          title: {
             display: true,
-            ticks: {
-              stepSize: 0.5
-            },
-						scaleLabel: {
+            text: this.label
+          },
+          tooltips: {
+            enabled: false,
+            mode: 'index',
+            intersect: false,
+          },
+          /*hover: {
+            mode: 'nearest',
+            intersect: true
+          },*/
+          ticks:{
+            source: 'labels'
+          },
+          scales: {
+            xAxes: [{
+              display: false,
+              type: 'time',
+              distribution: 'series',
+              time:{
+                unit: 'second',
+                displayFormats:{
+                  second: 'ss'
+                }
+              },
+              scaleLabel: {
+                display: false,
+                labelString: 'Time'
+              }
+            }],
+            yAxes: [{
+              beginAtZero: true,
               display: true,
-							//labelString: 'Value'
-						}
-					}]
-				}
-			}
-    });
-
-    this.robotService.registerPlotterComponent(parseInt(this.idPlot), this.fields);
-    this.subPlotAddDatamsg = this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
-      
-      if(msg == null)return;
-      if (this.isfrozen)return;
-      this.data.labels.push(new Date());
-      for (let pdata of msg){
-        var name = pdata["name"];
-        if(name == null) return;
-        var i = this.map.get(name);
-        var value = pdata["value"];
-        value = Math.round(value * 100) / 100;
-        //console.log("ACCESS TO pos "+ i +" value "+value);
-        this.addDataToDataset(this.data.datasets[i],value);
-      }
-    });
-
-    this.subPlotAddmsg = this.robotService.currentPlotAddmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
-      if(msg == null)return;
-      var topic = msg["topic"];
-      if( topic == null) return;
-      var id = msg["id"];
-      var name = msg["name"];
-      this.addDataset(name+"/"+topic);
-      var i = this.data.datasets.length -1;
-      this.map.set(id,i);
-      //console.log("ADD plot at "+ "pos "+i+" name "+name);
-    });
-
-    this.subPlotClearmsg = this.robotService.currentClearmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
-      if(msg == null)return;
-      this.clearData();
-    });
+              ticks: {
+                stepSize: 0.5
+              },
+              scaleLabel: {
+                display: true,
+                //labelString: 'Value'
+              }
+            }]
+          }
+        }
+      });
+  
+      this.robotService.registerPlotterComponent(parseInt(this.idPlot), this.fields);
+      this.subPlotAddDatamsg = this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
+        
+        if(msg == null)return;
+        if (this.isfrozen)return;
+        this.data.labels.push(new Date());
+        for (let pdata of msg){
+          var name = pdata["name"];
+          if(name == null) return;
+          var i = this.map.get(name);
+          var value = pdata["value"];
+          value = Math.round(value * 100) / 100;
+          //console.log("ACCESS TO pos "+ i +" value "+value);
+          this.addDataToDataset(this.data.datasets[i],value);
+        }
+      });
+  
+      this.subPlotAddmsg = this.robotService.currentPlotAddmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
+        if(msg == null)return;
+        var topic = msg["topic"];
+        if( topic == null) return;
+        var id = msg["id"];
+        var name = msg["name"];
+        this.addDataset(name+"/"+topic);
+        var i = this.data.datasets.length -1;
+        this.map.set(id,i);
+        //console.log("ADD plot at "+ "pos "+i+" name "+name);
+      });
+  
+      this.subPlotClearmsg = this.robotService.currentClearmsg.get(parseInt(this.idPlot)).subscribe(msg => {	
+        if(msg == null)return;
+        this.clearData();
+      });
+    },100);
+    
   }
 
   ngOnDestroy() {

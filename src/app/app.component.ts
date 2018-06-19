@@ -35,6 +35,7 @@ export class AppComponent {
   public modelViewFlag = true;
   public plotterViewFlag = false;
   public allPlotsViewFlag = false;
+  public controlPanelViewFlag = false;
 
   changeView(param){
     //console.log("enableModelView"+ param);
@@ -52,6 +53,16 @@ export class AppComponent {
       this.plotterViewFlag = false;
       this.allPlotsViewFlag = true;
       this.modelViewFlag = false;
+    }
+  }
+
+  changeViewPanel(param){
+    //console.log("enableModelView"+ param);
+    if (param == "Global"){
+      this.controlPanelViewFlag = false;
+    }
+    else if (param == "Single"){
+      this.controlPanelViewFlag = true;
     }
   }
 

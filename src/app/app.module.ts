@@ -47,6 +47,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatTreeModule} from '@angular/material/tree';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import {MatTreeModule} from '@angular/material/tree';
     CanvasComponent,
     PlotterComponent,
     ControlPanelComponent,
-    TreePanelComponent
+    TreePanelComponent,
+    BarChartComponent
   ],
   imports: [
     BrowserModule,

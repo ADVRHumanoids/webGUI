@@ -45,6 +45,11 @@ export class RobotStateService {
   public selectJointSensorId = 0;
   private interval;
   public isJoint = true;
+  private barAddMsg = new Map<number, BehaviorSubject<any> >();
+  public currentBarAddmsg = new Map<number,Observable<any> >();
+  private barAddDataMsg = new Map<number, BehaviorSubject<any> >();
+  public currentBarAddDatamsg = new Map<number,Observable<any> >();
+  public currentTopicBar = "temperature";
 
   onError(err){
     console.log("WebSocket Error occur "+err);
@@ -67,6 +72,7 @@ export class RobotStateService {
 
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
+
     this.connectWebSocket();   
     this.wsService.messages.subscribe(msg => {		
       this.parseMsg(msg);
@@ -93,6 +99,14 @@ export class RobotStateService {
       this.topicPlotMap.set(id,fields);
   }
 
+  registerBarChartComponent(id){
+    this.barAddDataMsg.set(id,new BehaviorSubject<any>({}));
+    this.currentBarAddDatamsg.set(id,this.barAddDataMsg.get(id).asObservable());
+ 
+    this.barAddMsg.set(id,new BehaviorSubject<any>({}));
+    this.currentBarAddmsg.set(id,this.barAddMsg.get(id).asObservable());
+  }
+
   getJointId(param){
     var obj = this.robot.get(param);
     return obj.id;
@@ -117,6 +131,10 @@ export class RobotStateService {
       var velrefs = robot["vel_ref"];
       var torrefs = robot["eff_ref"];
       var auxs = robot["aux"];
+
+      //var barTopic = robot[this.currentTopicBar];
+      //if (barTopic != null)
+      this.barAddDataMsg.get(0).next({"robot":robot,"topic":this.currentTopicBar});
 
       for (let i = 0; i < nameList.length ; i++) {
         var obj = {
@@ -242,6 +260,11 @@ export class RobotStateService {
       this.plotArrayMap.set(idPlot, new Array<any>());
     var addMsgItem = this.plotAddMsg.get(idPlot);
     addMsgItem.next(obj);
+  }
+
+  addBar(idPlot,topic){
+    var addMsgItem = this.barAddMsg.get(idPlot);
+    addMsgItem.next(topic);
   }
 
   plotState(id, name){

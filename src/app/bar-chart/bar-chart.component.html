@@ -1,0 +1,21 @@
+<div style="width:100%; height:100%"
+fxLayout ="column"
+fxLayout.xs="column"
+fxLayoutAlign="center stretch"
+fxLayoutGap="2px"
+fxLayoutGap.xs="0">
+  <div class="item item-1"  fxFlex=80 >
+    <div style=" height:100%">
+      <canvas [id]="getId()"></canvas>
+    </div> 
+  </div>
+  <div class="item item-2"  fxFlex=20 >
+    <div style=" height:100%; overflow: scroll;">
+      <mat-list role="list">
+          <mat-list-item style=" width:100%;" *ngFor="let litem of topics">
+              <button (click) ="setTopic(litem)" style=" width:100%;"  mat-button> {{litem}}</button>
+          </mat-list-item>
+      </mat-list>
+    </div> 
+  </div>
+</div>
