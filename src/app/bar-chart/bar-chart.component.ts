@@ -99,6 +99,7 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
         type: 'bar',
         data: this.data,
         options: {
+          events: ['click'],
           responsiveAnimationDuration:0,
           animation:{
             duration: 0
@@ -111,9 +112,16 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
             text: this.label
           },
           tooltips: {
-            enabled: false,
+            enabled: true,
             mode: 'index',
-            intersect: false,
+            intersect: true,
+            callbacks: {
+              afterLabel: (tooltipItem, data)=>{ 
+                this.robotService.selectJointSensorName = tooltipItem.xLabel;
+                this.robotService.advertiseSelectedJoint(this.robotService.selectJointSensorName);
+                return "";
+              }
+            }
           },
           /*hover: {
             mode: 'nearest',
@@ -129,6 +137,10 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
             }],
             yAxes: [{
               display: true,
+              ticks: {
+                //stepSize: 0.5
+                beginAtZero: true,
+              },
               scaleLabel: {
                 display: true,
                 //labelString: 'Value'
@@ -192,11 +204,15 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
     this.data.datasets[0].label = label;
   }
 
+  setScale(val){
+    this.myChart.options.scales.yAxes[0].ticks.stepSize = val;
+  }
+
   addDataToDataset(msg){
 
     for (let i = 0; i < this.data.labels.length; i++) {
       this.data.datasets[0].data[i] = msg[i];
     }
-    this.myChart.update();
+    this.myChart.update(0);
   }
 }

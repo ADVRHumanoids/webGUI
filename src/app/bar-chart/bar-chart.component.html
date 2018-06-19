@@ -4,12 +4,19 @@ fxLayout.xs="column"
 fxLayoutAlign="center stretch"
 fxLayoutGap="2px"
 fxLayoutGap.xs="0">
-  <div class="item item-1"  fxFlex=80 >
+  <div class="item item-1"  fxFlex=70 >
     <div style=" height:100%">
       <canvas [id]="getId()"></canvas>
     </div> 
   </div>
-  <div class="item item-2"  fxFlex=20 >
+  <div class="item item-2"  fxFlex="10" >
+      <div style=" height:100%">
+        <div >
+          Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" style=" width:50px" > 
+        </div> 
+      </div>
+    </div>
+  <div class="item item-3"  fxFlex=20 >
     <div style=" height:100%; overflow: scroll;">
       <mat-list role="list">
           <mat-list-item style=" width:100%;" *ngFor="let litem of topics">

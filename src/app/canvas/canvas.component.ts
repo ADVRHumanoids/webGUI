@@ -243,6 +243,13 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           link.add(joint);
           this.scene.add(link);
 
+          /*var fkey;
+          for (let entry of Array.from(this.jointmap.entries())) {
+            fkey = entry[0];
+          }
+          this.robotService.selectJointSensorName = fkey;
+          this.robotService.advertiseSelectedJoint(this.robotService.selectJointSensorName);
+          */
            //load meshes
           this.linkmap.forEach((value: THREE.Object3D, key: string) => {
             if(value.userData != null){
@@ -492,6 +499,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
               this.robotService.selectJointSensorName = sensor;
             }
         }
+        this.robotService.advertiseSelectedJoint(this.robotService.selectJointSensorName);
     }
   }
 

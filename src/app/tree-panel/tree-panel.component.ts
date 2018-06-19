@@ -135,17 +135,19 @@ export class TreePanelComponent implements OnInit {
 
   public selectedDevice="";
   public jointId;
-  public isJoint= false;
+  public isJoint= true;
 
   ngOnInit(){
   }
 
   setActiveDevice(param, param1){
     this.selectedDevice = param;
-    this.isJoint = this.robotService.isJoint;
+    //this.isJoint = this.robotService.isJoint;
     this.robotService.selectJointSensorName = param;   
-    if(param1 != null)  
+    if(param1 != null) {  
       this.robotService.isJoint = param1;
+      this.isJoint = this.robotService.isJoint;
+    }
     if(param1 != null && param1){
       this.jointId = this.robotService.getJointId(param);
     }
@@ -165,6 +167,11 @@ export class TreePanelComponent implements OnInit {
 
   constructor(database: FileDatabase,robotService: RobotStateService) {
     this.robotService = robotService;
+    this.robotService.currentJointmsg.subscribe(msg => {	
+      this.selectedDevice = msg;
+      this.isJoint = this.robotService.isJoint;
+    });
+
     this.treeFlattener = new MatTreeFlattener(this.transformer, this._getLevel,
       this._isExpandable, this._getChildren);
     this.treeControl = new FlatTreeControl<DeviceFlatNode>(this._getLevel, this._isExpandable);

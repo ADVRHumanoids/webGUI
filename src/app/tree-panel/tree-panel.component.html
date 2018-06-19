@@ -25,9 +25,9 @@ fxLayoutGap.xs="0">
         </div> 
     </div>
     <div class="item item-3"  fxFlex="10" >
-        <div style=" height:100%">
-            <div style="background-color: orange; height:100%">
-                   {{selectedDevice}} <button  *ngIf="isJoint" mat-raised-button color="primary" type="button" (click)="plotState(jointId,selectedDevice)">PlotState</button>
+        <div style="width:100%; height:100%">
+            <div style="width:100%; height:100%">
+                   {{selectedDevice}} <button  style="margin-left: 20px;" *ngIf="isJoint" mat-raised-button color="primary" type="button" (click)="plotState(jointId,selectedDevice)">PlotState</button>
             </div> 
         </div> 
     </div>

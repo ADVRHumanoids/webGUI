@@ -45,8 +45,8 @@ export class RobotStateService {
   public selectJointSensorId = 0;
   private interval;
   public isJoint = true;
-  private barAddMsg = new Map<number, BehaviorSubject<any> >();
-  public currentBarAddmsg = new Map<number,Observable<any> >();
+  private JointMsg = new BehaviorSubject<any>({});
+  public currentJointmsg = new Observable<any>();
   private barAddDataMsg = new Map<number, BehaviorSubject<any> >();
   public currentBarAddDatamsg = new Map<number,Observable<any> >();
   public currentTopicBar = "temperature";
@@ -73,6 +73,7 @@ export class RobotStateService {
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
 
+    this.registerSelectedJoint();
     this.connectWebSocket();   
     this.wsService.messages.subscribe(msg => {		
       this.parseMsg(msg);
@@ -82,6 +83,10 @@ export class RobotStateService {
   
   publishMsg(msg){
     this.parsedMsg.next(msg);
+  }
+
+  registerSelectedJoint(){
+    this.currentJointmsg = this.JointMsg.asObservable();
   }
 
   registerPlotterComponent(id, fields){
@@ -102,9 +107,6 @@ export class RobotStateService {
   registerBarChartComponent(id){
     this.barAddDataMsg.set(id,new BehaviorSubject<any>({}));
     this.currentBarAddDatamsg.set(id,this.barAddDataMsg.get(id).asObservable());
- 
-    this.barAddMsg.set(id,new BehaviorSubject<any>({}));
-    this.currentBarAddmsg.set(id,this.barAddMsg.get(id).asObservable());
   }
 
   getJointId(param){
@@ -262,9 +264,8 @@ export class RobotStateService {
     addMsgItem.next(obj);
   }
 
-  addBar(idPlot,topic){
-    var addMsgItem = this.barAddMsg.get(idPlot);
-    addMsgItem.next(topic);
+  advertiseSelectedJoint(param){
+    this.JointMsg.next(param);
   }
 
   plotState(id, name){
