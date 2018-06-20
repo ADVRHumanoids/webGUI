@@ -2,17 +2,17 @@
 
 <mat-toolbar color="primary">
     <span>ROBOT WEB GUI</span>
-    <mat-button-toggle-group value="Model" style="margin-left: 50px;" #group="matButtonToggleGroup" name="mode" aria-label="Font Style" (change)="changeView(group.value)">
+    <mat-button-toggle-group *ngIf="tabIndex==0" value="Model" style="margin-left: 50px;" #group="matButtonToggleGroup" name="mode" aria-label="Font Style" (change)="changeView(group.value)">
         <mat-button-toggle value="Plotter">Plotter</mat-button-toggle>
         <mat-button-toggle value="Model">Model</mat-button-toggle>
         <mat-button-toggle value="AllPlots">4Plots</mat-button-toggle>
     </mat-button-toggle-group>
-    <mat-button-toggle-group value="Global" style="margin-left: 50px;" #groupPanel="matButtonToggleGroup" name="modePanel" aria-label="Font Style" (change)="changeViewPanel(groupPanel.value)">
+    <mat-button-toggle-group *ngIf="tabIndex==0 && !allPlotsViewFlag" value="Global" style="margin-left: 50px;" #groupPanel="matButtonToggleGroup" name="modePanel" aria-label="Font Style" (change)="changeViewPanel(groupPanel.value)">
         <mat-button-toggle value="Global">Global</mat-button-toggle>
         <mat-button-toggle value="Single">Single</mat-button-toggle>
         </mat-button-toggle-group>
 </mat-toolbar>
-<mat-tab-group style="width:100%; height:100%">
+<mat-tab-group style="width:100%; height:100%" (selectedTabChange)="onLinkClick($event)">
   <mat-tab style="width:100%; height:100%" label="Monitoring">
 
     <div style="width:100%; height:100%" class="containerModelPlot"

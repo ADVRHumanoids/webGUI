@@ -24,6 +24,7 @@ import { PluginListComponent } from './plugin-list/plugin-list.component';
 import { ControlPanelComponent } from './control-panel/control-panel.component';
 import { TreePanelComponent } from './tree-panel/tree-panel.component';
 import { Component} from '@angular/core';
+import { MatTabChangeEvent } from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -36,6 +37,7 @@ export class AppComponent {
   public plotterViewFlag = false;
   public allPlotsViewFlag = false;
   public controlPanelViewFlag = false;
+  public tabIndex = 0;
 
   changeView(param){
     //console.log("enableModelView"+ param);
@@ -65,6 +67,14 @@ export class AppComponent {
       this.controlPanelViewFlag = true;
     }
   }
+
+  onLinkClick(event: MatTabChangeEvent) {
+    //console.log('event => ', event);
+    this.tabIndex = event.index;
+    //console.log('index => ', event.index);
+    //console.log('tab => ', event.tab); 
+  }
+  
 
 }
 
