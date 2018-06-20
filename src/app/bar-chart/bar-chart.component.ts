@@ -204,8 +204,12 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
     this.data.datasets[0].label = label;
   }
 
-  setScale(val){
-    this.myChart.options.scales.yAxes[0].ticks.stepSize = val;
+  setMinScale(val){
+    this.myChart.options.scales.yAxes[0].ticks.min = parseFloat(val);
+  }
+
+  setMaxScale(val){
+    this.myChart.options.scales.yAxes[0].ticks.max = parseFloat(val);
   }
 
   addDataToDataset(msg){

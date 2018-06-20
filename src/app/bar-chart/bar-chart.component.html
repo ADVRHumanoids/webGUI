@@ -4,20 +4,22 @@ fxLayout.xs="column"
 fxLayoutAlign="center stretch"
 fxLayoutGap="2px"
 fxLayoutGap.xs="0">
-  <div class="item item-1"  fxFlex=70 >
+  <div class="item item-1"  fxFlex=75 >
     <div style=" height:100%">
       <canvas [id]="getId()"></canvas>
     </div> 
   </div>
-  <div class="item item-2"  fxFlex="10" >
+  <div class="item item-2"  fxFlex="5" >
       <div style=" height:100%">
         <div >
-          Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" style=" width:50px" > 
+          MinScale <input #MinScale name="range" step="0.1" (change)="setMinScale(MinScale.value)" style=" width:50px" >
+          MaxScale <input #MaxScale name="range" step="0.1" (change)="setMaxScale(MaxScale.value)" style=" width:50px" >  
         </div> 
       </div>
     </div>
   <div class="item item-3"  fxFlex=20 >
     <div style=" height:100%; overflow: scroll;">
+      <div  >TOPICS</div>
       <mat-list role="list">
           <mat-list-item style=" width:100%;" *ngFor="let litem of topics">
               <button (click) ="setTopic(litem)" style=" width:100%;"  mat-button> {{litem}}</button>

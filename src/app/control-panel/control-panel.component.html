@@ -1,39 +1,131 @@
-<div  *ngIf="isJoint;else sensor">
+<div style=" height:100%; overflow: scroll;" *ngIf="isJoint;else sensor">
   <mat-card class="example-card">
     <mat-card-header>
-        <mat-card-title>ID: {{robotState.id}}  Name: {{robotState.name}} </mat-card-title>
+        <mat-card-title>
+            <input style="border:none" type="text" name="clock" size="2" value="ID: {{robotState.id}}">
+            <input style="border:none" type="text" name="clock" size="15" value="Name: {{robotState.name}}">  
+        </mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <p>Motor Position: <input  disabled matInput style="width: 50px;" value={{robotState.motorPos}}> <button  mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'motorPos',robotState.name)">Plot</button>
-              Link Position: <input  disabled matInput style="width: 50px;" value={{robotState.linkPos}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'linkPos',robotState.name)">Plot</button></p> 
-      <p>Motor Velocity:  <input  disabled matInput style="width: 50px;" value={{robotState.motorVel}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'motorVel',robotState.name)">Plot</button>
-              Link Velocity: <input  disabled matInput style="width: 50px;" value= {{robotState.linkVel}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'linkVel',robotState.name)">Plot</button></p>
-      <p>Stiffness:  <input  disabled matInput style="width: 50px;" value={{robotState.stiff}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'stiff',robotState.name)">Plot</button>
-              Damping:  <input  disabled matInput style="width: 50px;" value={{robotState.damp}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'damp',robotState.name)">Plot</button></p>
-      <p>Torque:  <input  disabled matInput style="width: 50px;" value={{robotState.effort}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'effort',robotState.name)">Plot</button> 
-          Fault:  <input  disabled matInput style="width: 50px;" value={{robotState.fault}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'fault',robotState.name)">Plot</button></p>
-      <p>Temperature: <input  disabled matInput style="width: 50px;" value={{robotState.temp}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'temp',robotState.name)">Plot</button> 
-          Aux:  <input  disabled matInput style="width: 50px;" value={{robotState.aux}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotState.id,'aux',robotState.name)">Plot</button></p>
+    <mat-card-content >
+        <p>
+            <input style="border:none" type="text" name="clock" size="7" value="Motor Position:">
+            <input  disabled matInput style="width: 50px;" value={{robotState.motorPos}}> 
+            <button  mat-icon-button type="button" (click)="addPlot(robotState.id,'motorPos',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+
+            <input style="border:none" type="text" name="clock" size="7" value="Link Position:">
+            <input  disabled matInput style="width: 50px;" value={{robotState.linkPos}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'linkPos',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p> 
+
+        <p>
+            <input style="border:none" type="text" name="clock" size="7" value="Motor Velocity:">
+            <input  disabled matInput style="width: 50px;" value={{robotState.motorVel}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'motorVel',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+
+            <input style="border:none" type="text" name="clock" size="7" value="Link Velocity:">
+            <input  disabled matInput style="width: 50px;" value= {{robotState.linkVel}}>
+            <button mat-icon-button  type="button" (click)="addPlot(robotState.id,'linkVel',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+
+        <p>
+            <input style="border:none" type="text" name="clock" size="7" value="Stiffness:">
+            <input  disabled matInput style="width: 50px;" value={{robotState.stiff}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'stiff',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+
+            <input style="border:none" type="text" name="clock" size="7" value="Damping:">
+            <input  disabled matInput style="width: 50px;" value={{robotState.damp}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'damp',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+
+        <p>
+            <input style="border:none" type="text" name="clock" size="7" value="Torque:">  
+            <input  disabled matInput style="width: 50px;" value={{robotState.effort}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'effort',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button> 
+            <input style="border:none" type="text" name="clock" size="7" value="Fault:">
+
+            <input  disabled matInput style="width: 50px;" value={{robotState.fault}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'fault',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+
+        <p>
+            <input style="border:none" type="text" name="clock" size="7" value="Temperature:">  
+            <input  disabled matInput style="width: 50px;" value={{robotState.temp}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'temp',robotState.name)">
+             <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button> 
+            <input style="border:none" type="text" name="clock" size="7" value="Aux:">
+
+            <input  disabled matInput style="width: 50px;" value={{robotState.aux}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'aux',robotState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
     </mat-card-content>
   </mat-card>
-
 </div>
 
 
 <ng-template #sensor>
     <mat-card class="example-card">
     <mat-card-header>
-        <mat-card-title>ID: {{robotSensorState.id}}  Name: {{robotSensorState.name}}</mat-card-title>
+        <mat-card-title>
+            <input style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorState.id}}">
+            <input style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorState.name}}">           
+        </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-    <p>Force: x: <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcex}}> <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'forcex',robotSensorState.name)">Plot</button> 
-        y:<input  disabled matInput style="width: 50px;" value={{robotSensorState.forcey}}>  <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'forcey',robotSensorState.name)">Plot</button>
-        z:<input  disabled matInput style="width: 50px;" value={{robotSensorState.forcez}}>  <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'forcez',robotSensorState.name)">Plot</button>
-    </p>
-    <p>Torque: x: <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquex}}>  <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'torquex',robotSensorState.name)">Plot</button>
-        y: <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquey}}>  <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'torquey',robotSensorState.name)">Plot</button>
-        z: <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquez}}>  <button mat-raised-button color="primary" type="button" (click)="addPlot(robotSensorState.id,'torquez',robotSensorState.name)">Plot</button>      
-    </p>
+    <p>Force: </p>
+        <p>
+            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="x:">
+
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcex}}>
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcex',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button> 
+            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcey}}>
+            <button mat-icon-button  type="button" (click)="addPlot(robotSensorState.id,'forcey',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcez}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcez',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+    <p>Torque:</p>
+        <p>
+            <input style="border:none; width: 20px" type="text" value="x:"> 
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquex}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquex',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquey}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquey',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquez}}>  
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquez',robotSensorState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon></button>      
+        </p>
         </mat-card-content>
     </mat-card>
 </ng-template>
