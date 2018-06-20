@@ -1,6 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RobotStateService } from './../services/robot-state.service';
 import { Observable, Subject, Subscription } from 'rxjs';
+import { AppError } from './../common/app-error';
+import { NotFoundError } from './../common/not-foud-error';
+import { HttpClient } from '@angular/common/http';
+import { HttpService } from './../services/http.service';
 
 @Component({
   selector: 'app-control-panel',
@@ -17,6 +21,15 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   private sub : Subscription;
+
+  public type = "range";
+  private service;
+
+  private pval = 0.0;
+  private vval = 0.0;
+  private eval = 0.0;
+  private sval = 0.0;
+  private dval = 0.0;
 
   private robotState = {
     name: "",
@@ -51,11 +64,19 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   private robotService: RobotStateService;
   private robot: Map<string, any>;
   private robotSensor: Map<string, any>;
+  private isControlEnable = false;
 
-  constructor(robotService: RobotStateService) { 
+  constructor(robotService: RobotStateService, http: HttpClient) { 
     this.robotService = robotService;
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
+    this.service = new HttpService(http);
+    this.service.setURL("/singlejoint");
+
+    this.robotService.currentJointmsg.subscribe(msg => {	
+      this.setControl();
+    });
+
     this.sub = this.robotService.currentmsg.subscribe(msg => {	
       this.robot = msg["robot"];
       this.robotSensor = msg["sensor"];
@@ -78,9 +99,109 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+
+    /*this.service.get("/chains")
+    .subscribe(
+      response => {
+         for (let o of response["Chains"]){
+           let p =o["Val"];
+           let chna =o["Chain"];
+            for (let u of p){
+              this.chains.set(u["ID"],{ Chain: chna, Val:{ Name :u["Name"] , Id: u["ID"], JVal: u["Lval"],
+              VVal: u["Vval"], EVal: u["Eval"], SVal: u["Sval"], DVal: u["Dval"], PRef: u["pos_ref"],
+              VRef: u["vel_ref"], ERef: u["eff_ref"], Llimit: u["Llimit"], Ulimit: u["Ulimit"] } });
+            }
+        }
+      },
+      (error: AppError) => {
+
+        //rimovo dal vettore
+        
+        if (error instanceof NotFoundError){
+          //expected error
+          //deleted
+          //this.form.setErrors(error.json());
+        }
+        else{
+          //unexpected error
+          throw error;
+
+        }
+        
+       });*/
   }
 
   addPlot(id, topic, name){
     this.robotService.addPlot(0,id,topic,name);
+  }
+
+
+  setPosRef(param: number){
+
+    this.pval = param;
+
+  }
+
+  setVelRef(param: number){
+    
+   this.vval = param;
+    
+  }
+
+  setEffortRef(param: number){
+    
+   this.eval = param;
+    
+  }
+
+  setStiffRef(param: number){
+    
+    this.sval = param;
+    
+  }
+
+  setDampRef(param: number){
+    
+    this.dval = param;
+    
+  }
+
+  sendVal(id:number){
+
+    //{"joint":[{"id": 15, "val": 0},{"id": 16, "val": 0}]}
+    this.service.create({"joint":[{"id": Number(this.robotState.id), "pos": Number(this.pval),
+    "vel": Number(this.vval),  "eff": Number(this.eval),  "stiff": Number(this.sval),
+    "damp": Number(this.dval) }]})
+    .subscribe(
+      response => {
+        
+      },
+      (error: AppError) => {
+
+        //rimovo dal vettore
+        
+        if (error instanceof NotFoundError){
+          //expected error
+          //deleted
+          //this.form.setErrors(error.json());
+        }
+        else{
+          //unexpected error
+          throw error;
+
+        }
+        
+       });
+
+  }
+
+  setControl(){
+    if(this.isControlEnable){
+      this.pval = this.robotState.refPos;
+      this.vval = this.robotState.refVel;
+      this.eval = this.robotState.refTor;
+      this.sval = this.robotState.stiff;
+      this.dval = this.robotState.damp;
+    }
   }
 }

@@ -1,20 +1,20 @@
 <div style=" height:100%; overflow: scroll;" *ngIf="isJoint;else sensor">
-  <mat-card class="example-card">
+  <mat-card style="margin-top: 10px" class="example-card">
     <mat-card-header>
         <mat-card-title>
-            <input style="border:none" type="text" name="clock" size="2" value="ID: {{robotState.id}}">
-            <input style="border:none" type="text" name="clock" size="15" value="Name: {{robotState.name}}">  
+            <input readonly style="border:none" type="text" name="clock" size="2" value="ID: {{robotState.id}}">
+            <input readonly style="border:none" type="text" name="clock" size="15" value="Name: {{robotState.name}}">  
         </mat-card-title>
     </mat-card-header>
     <mat-card-content >
         <p>
-            <input style="border:none" type="text" name="clock" size="7" value="Motor Position:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Motor Position:">
             <input  disabled matInput style="width: 50px;" value={{robotState.motorPos}}> 
             <button  mat-icon-button type="button" (click)="addPlot(robotState.id,'motorPos',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
 
-            <input style="border:none" type="text" name="clock" size="7" value="Link Position:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Link Position:">
             <input  disabled matInput style="width: 50px;" value={{robotState.linkPos}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'linkPos',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
@@ -22,13 +22,13 @@
         </p> 
 
         <p>
-            <input style="border:none" type="text" name="clock" size="7" value="Motor Velocity:">
-            <input  disabled matInput style="width: 50px;" value={{robotState.motorVel}}> 
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Motor Velocity:">
+            <input disabled matInput style="width: 50px;" value={{robotState.motorVel}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'motorVel',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
 
-            <input style="border:none" type="text" name="clock" size="7" value="Link Velocity:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Link Velocity:">
             <input  disabled matInput style="width: 50px;" value= {{robotState.linkVel}}>
             <button mat-icon-button  type="button" (click)="addPlot(robotState.id,'linkVel',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
@@ -36,13 +36,13 @@
         </p>
 
         <p>
-            <input style="border:none" type="text" name="clock" size="7" value="Stiffness:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Stiffness:">
             <input  disabled matInput style="width: 50px;" value={{robotState.stiff}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'stiff',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
 
-            <input style="border:none" type="text" name="clock" size="7" value="Damping:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Damping:">
             <input  disabled matInput style="width: 50px;" value={{robotState.damp}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'damp',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
@@ -50,12 +50,12 @@
         </p>
 
         <p>
-            <input style="border:none" type="text" name="clock" size="7" value="Torque:">  
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Torque:">  
             <input  disabled matInput style="width: 50px;" value={{robotState.effort}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'effort',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
-            <input style="border:none" type="text" name="clock" size="7" value="Fault:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Fault:">
 
             <input  disabled matInput style="width: 50px;" value={{robotState.fault}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'fault',robotState.name)">
@@ -64,12 +64,12 @@
         </p>
 
         <p>
-            <input style="border:none" type="text" name="clock" size="7" value="Temperature:">  
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Temperature:">  
             <input  disabled matInput style="width: 50px;" value={{robotState.temp}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'temp',robotState.name)">
              <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
-            <input style="border:none" type="text" name="clock" size="7" value="Aux:">
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Aux:">
 
             <input  disabled matInput style="width: 50px;" value={{robotState.aux}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'aux',robotState.name)">
@@ -78,6 +78,171 @@
         </p>
     </mat-card-content>
   </mat-card>
+
+<mat-card style="margin-top: 10px" class="example-card">
+    <mat-card-header>
+        <mat-card-title>
+            <input readonly style="border:none" type="text" name="clock" size="2" value="Control">
+            <mat-slide-toggle #Toggle
+            style="margin-left:20px" 
+            (change)="isControlEnable = ! isControlEnable; setControl()"
+            color="primary"
+            [checked]="isControlEnable"
+            >Enable</mat-slide-toggle>       
+            <button  style="margin-left:60px"  *ngIf="isControlEnable;" mat-raised-button  type="button" (click)="setPosRef(Pos.value); setVelRef(Vel.value); setEffortRef(Torque.value); setStiffRef(Stiff.value); setDampRef(Damp.value); sendVal(robotState.id)">Send</button>
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content >
+        <div  [hidden]="isControlEnable">
+                <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Position:">
+                        <mat-slider #PosOFF
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="step"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="robotState.refPos">
+                        </mat-slider>
+                    {{robotState.refPos}}
+                    </p> 
+                    <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Velocity:">
+                        <mat-slider #VelOFF
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="step"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="robotState.refVel">
+                    </mat-slider>
+                    {{robotState.refVel}}
+                    </p>
+                    <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Torque:">
+                        <mat-slider #TorqueOFF
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="step"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="robotState.refTor">
+                    </mat-slider>
+                    {{robotState.refTor}}
+                    </p> 
+                    <p>
+                        <input readonly style="border:none" type="text"  size="7" value="Stiffness:">
+                        <mat-slider #StiffOFF
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]=10000.0 
+                        [min]=0.0
+                        [thumbLabel]="false"
+                        [step]="step"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="robotState.stiff">
+                    </mat-slider>
+                    {{robotState.stiff}}
+                    </p>
+                    <p>
+                        <input readonly style="border:none"  type="text" size="7" value="Damping:">
+                        <mat-slider  #DampOFF
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]=10000.0 
+                        [min]=0.0
+                        [thumbLabel]="false"
+                        [step]="step"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="robotState.damp">
+                    </mat-slider>
+                    {{robotState.damp}}
+                    </p>  
+        </div>
+
+        <div  [hidden]="!isControlEnable">
+
+                <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Position:">
+                        <mat-slider #Pos
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="0.1"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="pval">
+                        </mat-slider>
+                    {{Pos.value}}
+                    </p> 
+                    <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Velocity:">
+                        <mat-slider #Vel
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="0.1"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="vval">
+                    </mat-slider>
+                    {{Vel.value}}
+                    </p>
+                    <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Torque:">
+                        <mat-slider #Torque
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]="max"
+                        [min]="min"
+                        [step]="0.1"
+                        [thumbLabel]="false"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="eval">
+                    </mat-slider>
+                    {{Torque.value}}
+                    </p> 
+                    <p>
+                        <input readonly style="border:none" type="text"  size="7" value="Stiffness:">
+                        <mat-slider #Stiff
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]=10000.0 
+                        [min]=0.0
+                        [thumbLabel]="false"
+                        [step]="0.1"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="sval">
+                    </mat-slider>
+                    {{Stiff.value}}
+                    </p>
+                    <p>
+                        <input readonly style="border:none"  type="text"  size="7" value="Damping:">
+                        <mat-slider #Damp
+                        class="example-margin"
+                        [disabled]="disabled"
+                        [max]=10000.0 
+                        [min]=0.0
+                        [thumbLabel]="false"
+                        [step]="0.1"
+                        [tickInterval]="tickInterval"
+                        [(ngModel)]="dval">
+                    </mat-slider>
+                    {{Damp.value}}
+                    </p>  
+        </div>
+
+    </mat-card-content>
+  </mat-card>
+
 </div>
 
 
@@ -85,25 +250,25 @@
     <mat-card class="example-card">
     <mat-card-header>
         <mat-card-title>
-            <input style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorState.id}}">
-            <input style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorState.name}}">           
+            <input readonly style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorState.id}}">
+            <input readonly style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorState.name}}">           
         </mat-card-title>
     </mat-card-header>
     <mat-card-content>
     <p>Force: </p>
         <p>
-            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="x:">
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="x:">
 
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcex}}>
             <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcex',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
-            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcey}}>
             <button mat-icon-button  type="button" (click)="addPlot(robotSensorState.id,'forcey',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
-            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcez}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcez',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
@@ -111,17 +276,17 @@
         </p>
     <p>Torque:</p>
         <p>
-            <input style="border:none; width: 20px" type="text" value="x:"> 
+            <input readonly style="border:none; width: 20px" type="text" value="x:"> 
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquex}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquex',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
-            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquey}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquey',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
-            <input style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
             <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquez}}>  
             <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquez',robotSensorState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon></button>      
@@ -130,4 +295,148 @@
     </mat-card>
 </ng-template>
       
-      
+<ng-template #ControlOFF>
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Position:">
+    <mat-slider #PosOFF
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [(ngModel)]="robotState.refPos">
+    </mat-slider>
+{{robotState.refPos}}
+</p> 
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Velocity:">
+    <mat-slider #VelOFF
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [(ngModel)]="robotState.refVel">
+</mat-slider>
+{{robotState.refVel}}
+</p>
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Torque:">
+    <mat-slider #TorqueOFF
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [(ngModel)]="robotState.refTor">
+</mat-slider>
+{{robotState.refTor}}
+</p> 
+<p>
+    <input readonly style="border:none" type="text"  size="7" value="Stiffness:">
+    <mat-slider #StiffOFF
+    class="example-margin"
+    [disabled]="disabled"
+    [max]=10000.0 
+    [min]=0.0
+    [thumbLabel]="false"
+    [step]="step"
+    [tickInterval]="tickInterval"
+    [(ngModel)]="robotState.stiff">
+</mat-slider>
+{{robotState.stiff}}
+</p>
+<p>
+    <input readonly style="border:none"  type="text" size="7" value="Damping:">
+    <mat-slider  #DampOFF
+    class="example-margin"
+    [disabled]="disabled"
+    [max]=10000.0 
+    [min]=0.0
+    [thumbLabel]="false"
+    [step]="step"
+    [tickInterval]="tickInterval"
+    [(ngModel)]="robotState.damp">
+</mat-slider>
+{{robotState.damp}}
+</p>  
+</ng-template>     
+
+<ng-template #ControlON>
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Position:">
+    <mat-slider #Pos
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [value]="robotState.refPos">
+    </mat-slider>
+{{Pos.value}}
+</p> 
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Velocity:">
+    <mat-slider #Vel
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [value]="robotState.refVel">
+</mat-slider>
+{{Vel.value}}
+</p>
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Torque:">
+    <mat-slider #Torque
+    class="example-margin"
+    [disabled]="disabled"
+    [max]="max"
+    [min]="min"
+    [step]="step"
+    [thumbLabel]="false"
+    [tickInterval]="tickInterval"
+    [value]="robotState.refTor">
+</mat-slider>
+{{Torque.value}}
+</p> 
+<p>
+    <input readonly style="border:none" type="text"  size="7" value="Stiffness:">
+    <mat-slider #Stiff
+    class="example-margin"
+    [disabled]="disabled"
+    [max]=10000.0 
+    [min]=0.0
+    [thumbLabel]="false"
+    [step]="step"
+    [tickInterval]="tickInterval"
+    [value]="robotState.stiff">
+</mat-slider>
+{{Stiff.value}}
+</p>
+<p>
+    <input readonly style="border:none"  type="text"  size="7" value="Damping:">
+    <mat-slider #Damp
+    class="example-margin"
+    [disabled]="disabled"
+    [max]=10000.0 
+    [min]=0.0
+    [thumbLabel]="false"
+    [step]="step"
+    [tickInterval]="tickInterval"
+    [value]="robotState.damp">
+</mat-slider>
+{{Damp.value}}
+</p>        
+</ng-template>   

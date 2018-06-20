@@ -48,6 +48,8 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatTreeModule} from '@angular/material/tree';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
+import {MatSliderModule} from '@angular/material/slider';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -75,7 +77,9 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
     MatTabsModule,
     MatIconModule,
     MatButtonToggleModule,
-    MatTreeModule
+    MatTreeModule,
+    MatSliderModule,
+    MatSlideToggleModule
   ],
   providers: [
      HttpService,
