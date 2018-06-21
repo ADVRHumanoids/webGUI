@@ -71,6 +71,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     private isModelLoaded: boolean;
     private selectMaterial: any;
     private idAnimationFrame;
+    private timeout;
 
     /*private robotState = {
       name: "",
@@ -402,7 +403,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   
     ngAfterViewInit() {
       console.log("ngAfterViewInit");
-      setTimeout(()=>{ 
+      this.timeout = setTimeout(()=>{ 
         this.resize();
       },100);
     }
@@ -410,6 +411,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy() {
      
       cancelAnimationFrame(this.idAnimationFrame);
+      clearTimeout(this.timeout);
       this.idAnimationFrame = null;
       this.robotService = null;
       this.linkmap = null;
