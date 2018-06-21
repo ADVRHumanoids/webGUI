@@ -344,15 +344,17 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       //mesh.dispatchEvent({type:'click'});
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      let my = <THREE.Mesh>this.linkmap.get(id);
-      my.geometry = mesh.geometry;
-      var scale = my.userData["scale"];
-      if (scale != null)
-        my.geometry.scale(scale[0],scale[1],scale[2]);
-      my.material = mesh.material;
-      geometry.computeFaceNormals();
-      geometry.computeVertexNormals();
-      my.userData["load"] = true;
+      if (this.linkmap != null){
+        let my = <THREE.Mesh>this.linkmap.get(id);
+        my.geometry = mesh.geometry;
+        var scale = my.userData["scale"];
+        if (scale != null)
+          my.geometry.scale(scale[0],scale[1],scale[2]);
+        my.material = mesh.material;
+        geometry.computeFaceNormals();
+        geometry.computeVertexNormals();
+        my.userData["load"] = true;
+      }
     }
   
     init(){
@@ -449,18 +451,23 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       let self: CanvasComponent = this;
       (function render(){
         self.idAnimationFrame = requestAnimationFrame(render);
-        self.renderer.render(self.scene, self.camera);
+        if(self.scene != null && self.camera != null)
+          self.renderer.render(self.scene, self.camera);
         if (self.selectedObject != null){
           (<THREE.Mesh>self.selectedObject).material = self.selectMaterial;
         }
-        var joint = self.jointmap.get(self.robotService.selectJointSensorName)
+        var joint = null;
+        if(self.jointmap != null)
+          joint = self.jointmap.get(self.robotService.selectJointSensorName)
         if (joint!= null) { 
           self.selectedObject = joint.children[0]; 
           self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
           (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
         }
         else {
-          var sensor = self.linkmap.get(self.robotService.selectJointSensorName);
+          var sensor = null;
+          if(self.linkmap != null)
+            sensor = self.linkmap.get(self.robotService.selectJointSensorName);
           if(sensor != null){
             self.selectedObject = sensor; 
             self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
