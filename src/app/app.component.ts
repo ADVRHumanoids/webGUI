@@ -38,6 +38,8 @@ export class AppComponent {
   public allPlotsViewFlag = false;
   public controlPanelViewFlag = false;
   public tabIndex = 0;
+  public toggleGlobal = "Global";
+  public toggleModel = "Model";
 
   changeView(param){
     //console.log("enableModelView"+ param);
@@ -56,10 +58,12 @@ export class AppComponent {
       this.allPlotsViewFlag = true;
       this.modelViewFlag = false;
     }
+    this.toggleModel = param;
   }
 
   changeViewPanel(param){
     //console.log("enableModelView"+ param);
+    this.toggleGlobal = param;
     if (param == "Global"){
       this.controlPanelViewFlag = false;
     }

@@ -489,6 +489,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           {                          
             this.robotService.isJoint = true;
             this.robotService.selectJointSensorName = userdata["name"];
+            var id =this.robotService.getJointId(this.robotService.selectJointSensorName);
+            this.robotService.selectJointSensorId = id;
           }
         }
         var userdata = this.selectedObject.userData;

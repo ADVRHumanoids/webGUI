@@ -150,12 +150,15 @@ export class TreePanelComponent implements OnInit {
     }
     if(param1 != null && param1){
       this.jointId = this.robotService.getJointId(param);
+      this.robotService.selectJointSensorId = this.jointId;
+      this.robotService.selectJointSensorName = param;
     }
   }
 
   plotState(id, name){
-    if(this.isJoint)
-      this.robotService.plotState(id,name);
+    if(this.isJoint){
+      this.robotService.plotState(this.robotService.selectJointSensorId,this.robotService.selectJointSensorName);
+    }
   }
 
   treeControl: FlatTreeControl<DeviceFlatNode>;
