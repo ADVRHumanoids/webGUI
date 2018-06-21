@@ -33,7 +33,7 @@ var STLLoader = require('three-stl-loader')(THREE)
 var loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject} from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
 @Component({
@@ -389,6 +389,23 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.renderer.setSize(screen.width, screen.height);
       this.container.appendChild(this.renderer.domElement);
       this.render();
+
+      window.addEventListener('resize', this.OnWindowResize);
+      this.container.addEventListener('click',this.Onclick);
+    }
+
+    OnWindowResize = EventListener => {
+      this.resize();
+      this.render();
+    }
+
+    Onclick = MouseEvent =>{
+      var rect = this.renderer.domElement.getBoundingClientRect();
+      this.mouse.x = ( ( MouseEvent.clientX - rect.left ) / rect.width ) * 2 - 1;
+      this.mouse.y = - ( ( MouseEvent.clientY - rect.top ) / rect.height ) * 2 + 1;
+      //console.log(this.mouse.x + "" +this.mouse.y);
+      if(MouseEvent.which === 1)
+        this.CheckIntersection ();
     }
 
     resize(){
@@ -412,6 +429,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
      
       cancelAnimationFrame(this.idAnimationFrame);
       clearTimeout(this.timeout);
+      window.removeEventListener('resize', this.OnWindowResize);
+      this.container.removeEventListener('click',this.Onclick);
       this.idAnimationFrame = null;
       this.robotService = null;
       this.linkmap = null;
@@ -421,11 +440,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.camera = null;
       this.controls = null;
       this.container = null;
-      
-      //REMOVE HOSTLISTENER
     }
    
-    @HostListener('document:mousedown', ['$event'])
+    /*@HostListener('document:mousedown', ['$event'])
     checkIntersection (event: MouseEvent) {
       var rect = this.renderer.domElement.getBoundingClientRect();
       this.mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
@@ -433,7 +450,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       //console.log(this.mouse.x + "" +this.mouse.y);
       if(event.which === 1)
         this.CheckIntersection ();
-    }
+    }*/
 
     private getAspectRatio(): number {
       let height = this.container.clientHeight;
@@ -443,11 +460,11 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.container.clientWidth / this.container.clientHeight;
     }
 
-    @HostListener('window:resize', ['$event'])
+    /*@HostListener('window:resize', ['$event'])
     public onResize(event: Event) {
         this.resize();
         this.render();
-    }
+    }*/
 
     render(){
       let self: CanvasComponent = this;
@@ -499,6 +516,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
             this.robotService.isJoint = true;
             this.robotService.selectJointSensorName = userdata["name"];
             var id =this.robotService.getJointId(this.robotService.selectJointSensorName);
+            if (id != null)
             this.robotService.selectJointSensorId = id;
           }
         }

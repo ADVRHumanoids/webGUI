@@ -111,6 +111,7 @@ export class RobotStateService {
 
   getJointId(param){
     var obj = this.robot.get(param);
+    if (obj == null) return null;
     return obj.id;
   }
 
