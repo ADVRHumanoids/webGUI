@@ -244,6 +244,15 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           link.add(joint);
           this.scene.add(link);
 
+          //SAVE STATE
+          this.robotService.CanvasState.camera = this.camera;
+          this.robotService.CanvasState.scene = this.scene;
+          this.robotService.CanvasState.controls = this.controls;
+          this.robotService.CanvasState.jointMap = this.jointmap;
+          this.robotService.CanvasState.linkMap = this.linkmap;
+          this.robotService.CanvasState.renderer = this.renderer;
+          this.robotService.CanvasState.state = 1;
+
           /*var fkey;
           for (let entry of Array.from(this.jointmap.entries())) {
             fkey = entry[0];
@@ -291,8 +300,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       //console.log(this.container);
       this.raycaster = new THREE.Raycaster ();
       this.mouse = new THREE.Vector2 ();
-      this.init(); 
-      this.getData();
+      var isInit = this.init(); 
+      if (!isInit) this.getData();
     }
 
     addVectorMarker(){
@@ -370,28 +379,51 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         far    : 1000
       };
   
-      this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(view.angle, view.aspect, view.near, view.far);
-      this.renderer = new THREE.WebGLRenderer();
-      this.controls = new OrbitControls(this.camera,this.renderer.domElement);
-      this.scene.background = new THREE.Color( 0x72645b );
-      this.scene.add(this.camera);
-      //this.scene.add(new THREE.AxisHelper(20));
-      
-       // lights
-      var light = new THREE.PointLight( 0xffffff, 0.8 );
-      this.camera.add( light );
-      this.camera.position.set(1,0.5,2);
-      this.camera.lookAt(new THREE.Vector3(0,0,0));
-  
-      //this.camera.up.set(0,0,1);
-      this.scene.add( new THREE.AmbientLight( 0x222222 ) );
-      this.renderer.setSize(screen.width, screen.height);
-      this.container.appendChild(this.renderer.domElement);
-      this.render();
+      var status = false;
+      //Load state
+      if (this.robotService.CanvasState.state != 0){
+        if (this.robotService.CanvasState.camera != null)
+          this.camera = this.robotService.CanvasState.camera;
+        if (this.robotService.CanvasState.controls != null)
+          this.controls = this.robotService.CanvasState.controls;
+        if (this.robotService.CanvasState.scene != null)
+          this.scene = this.robotService.CanvasState.scene;
+        if (this.robotService.CanvasState.linkMap != null)
+          this.linkmap = this.robotService.CanvasState.linkMap;
+        if (this.robotService.CanvasState.jointMap != null)
+          this.jointmap = this.robotService.CanvasState.jointMap;
+        if (this.robotService.CanvasState.renderer != null)
+          this.renderer = this.robotService.CanvasState.renderer;
+        status = true;
+      }
+      else {
 
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(view.angle, view.aspect, view.near, view.far);
+        this.renderer = new THREE.WebGLRenderer();
+        this.controls = new OrbitControls(this.camera,this.renderer.domElement);
+        this.scene.background = new THREE.Color( 0x72645b );
+        this.scene.add(this.camera);
+        //this.scene.add(new THREE.AxisHelper(20));
+        
+         // lights
+        var light = new THREE.PointLight( 0xffffff, 0.8 );
+        this.camera.add( light );
+        this.camera.position.set(1,0.5,2);
+        this.camera.lookAt(new THREE.Vector3(0,0,0));
+    
+        //this.camera.up.set(0,0,1);
+        this.scene.add( new THREE.AmbientLight( 0x222222 ) );
+        this.renderer.setSize(screen.width, screen.height);
+        status = false;
+      }
+
+      this.render();
+      this.container.appendChild(this.renderer.domElement);
       window.addEventListener('resize', this.OnWindowResize);
       this.container.addEventListener('click',this.Onclick);
+
+      return status;
     }
 
     OnWindowResize = EventListener => {
@@ -462,12 +494,15 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       window.removeEventListener('resize', this.OnWindowResize);
       this.container.removeEventListener('click',this.Onclick);
       this.idAnimationFrame = null;
-      if (this.scene != null)
+      if (this.selectedObject != null){
+        (<THREE.Mesh>this.selectedObject).material = this.selectMaterial;
+      }
+      /*if (this.scene != null)
         while (this.scene.children.length > 0) {
           let obj = this.scene.children[0];
           this.scene.remove(obj);
           this.disposeHierarchy(obj, this.disposeNode);
-        }
+        }*/
       this.robotService = null;
       this.linkmap = null;
       this.jointmap = null;

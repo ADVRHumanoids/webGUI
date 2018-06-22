@@ -51,6 +51,16 @@ export class RobotStateService {
   public currentBarAddDatamsg = new Map<number,Observable<any> >();
   public currentTopicBar = "temperature";
 
+  public CanvasState = {
+    scene : null,
+    camera : null,
+    controls: null,
+    linkMap: null,
+    jointMap: null,
+    renderer: null,
+    state: 0
+  };
+
   onError(err){
     console.log("WebSocket Error occur "+err);
   }
