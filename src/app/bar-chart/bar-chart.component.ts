@@ -44,6 +44,7 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
   private subPlotAddmsg : Subscription;
   private subPlotClearmsg : Subscription;
   public topics = [];
+  private timeout;
 
   private chartColors = {
     red: 'rgb(255, 99, 132)',
@@ -79,7 +80,9 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
 
-    this.subPlotAddDatamsg.unsubscribe();
+    clearTimeout(this.timeout);
+    if(this.subPlotAddDatamsg != null)
+      this.subPlotAddDatamsg.unsubscribe();
     //this.subPlotAddmsg.unsubscribe();
     //this.subPlotClearmsg.unsubscribe();
     this.robotService = null;
@@ -90,7 +93,7 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
 
-    setTimeout(()=>{ 
+    this.timeout = setTimeout(()=>{ 
       console.log("CHART ID "+this.idPlot);
       this.isResponsive = true;
       this.canvas = document.getElementById(this.getId());

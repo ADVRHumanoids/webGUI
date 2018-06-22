@@ -45,7 +45,7 @@ export class PluginListComponent implements OnInit {
     this.service.getAll()
     .subscribe(
       response => {
-        console.log(response);
+        //console.log(response);
         for (let o of response["Plugins"]){
             this.plugins.push({ Name :o["Name"] , Status: o["Status"] });
         }

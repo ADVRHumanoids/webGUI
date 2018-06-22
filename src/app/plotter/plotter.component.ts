@@ -49,6 +49,7 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
   private subPlotAddmsg : Subscription;
   private subPlotClearmsg : Subscription;
   private interval;
+  private timeout;
 
   private chartColors = {
     red: 'rgb(255, 99, 132)',
@@ -89,7 +90,7 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
 
   ngAfterViewInit() {
 
-    setTimeout(()=>{ 
+    this.timeout = setTimeout(()=>{ 
       console.log("PLOTTER ID "+this.idPlot);
       //if( parseInt(this.idPlot) == 1) 
       //  this.isResponsive = false;
@@ -200,15 +201,16 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
 
   ngOnDestroy() {
 
-    this.subPlotAddDatamsg.unsubscribe();
-    this.subPlotAddmsg.unsubscribe();
-    this.subPlotClearmsg.unsubscribe();
+    clearTimeout(this.timeout);
+    if(this.subPlotAddDatamsg != null)
+      this.subPlotAddDatamsg.unsubscribe();
+    if(this.subPlotAddmsg != null)
+      this.subPlotAddmsg.unsubscribe();
+    if(this.subPlotClearmsg != null)
+      this.subPlotClearmsg.unsubscribe();
     clearInterval(this.interval);
     this.robotService = null;
     this.map = null;
-     
-     //REMOVE HOSTLISTENER
-     //REMOVE SETINTERVAL
    }
 
   setScale(val){

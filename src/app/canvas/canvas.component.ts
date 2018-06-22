@@ -502,25 +502,22 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       let intersects = this.raycaster.intersectObjects ( this.scene.children, true);
       //console.log(this.scene.children);
       if (intersects.length > 0) {
-        if (this.selectedObject != null){
-          (<THREE.Mesh>this.selectedObject).material = this.selectMaterial;
-        }
-        this.selectedObject = intersects[0].object;
-        this.selectMaterial = (<THREE.Mesh>this.selectedObject).material;
-        (<THREE.Mesh>this.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
+        var objs = intersects[0].object;
         //console.log(this.selectedObject);
-        var userdata = this.selectedObject.parent.userData;
+        var userdata = objs.parent.userData;
         if (userdata != null){
           if (this.jointmap.get(userdata["name"])!= null)
           {                          
-            this.robotService.isJoint = true;
-            this.robotService.selectJointSensorName = userdata["name"];
-            var id =this.robotService.getJointId(this.robotService.selectJointSensorName);
-            if (id != null)
-            this.robotService.selectJointSensorId = id;
+            var name = userdata["name"];
+            var id =this.robotService.getJointId(name);
+            if (id != null) {
+              this.robotService.isJoint = true;
+              this.robotService.selectJointSensorName = name;
+              this.robotService.selectJointSensorId = id;
+            }
           }
         }
-        var userdata = this.selectedObject.userData;
+        var userdata = objs.userData;
         if (userdata != null){
             var sensor = userdata["name"];
             if(sensor != null){
