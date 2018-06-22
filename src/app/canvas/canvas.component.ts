@@ -425,6 +425,36 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       },100);
     }
 
+    private disposeNode(node) {
+      if (node instanceof THREE.Mesh) {
+          node.parent = undefined;
+          if (node.geometry) {
+              node.geometry.dispose();
+          }
+          let material: any = node.material;
+          if (material) {
+              if (material.map) material.map.dispose();
+              if (material.lightMap) material.lightMap.dispose();
+              if (material.bumpMap) material.bumpMap.dispose();
+              if (material.normalMap) material.normalMap.dispose();
+              if (material.specularMap) material.specularMap.dispose();
+              if (material.envMap) material.envMap.dispose();
+              material.dispose();
+          }
+      } else if (node instanceof THREE.Object3D) {
+          node.parent.remove(node);
+          node.parent = undefined;
+      }
+    }
+
+    private disposeHierarchy(node, callback) {
+      for (var i = node.children.length - 1; i >= 0; i--) {
+          var child = node.children[i];
+          this.disposeHierarchy(child, callback);
+          callback(child);
+      }
+    }
+
     ngOnDestroy() {
      
       cancelAnimationFrame(this.idAnimationFrame);
@@ -432,6 +462,12 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       window.removeEventListener('resize', this.OnWindowResize);
       this.container.removeEventListener('click',this.Onclick);
       this.idAnimationFrame = null;
+      if (this.scene != null)
+        while (this.scene.children.length > 0) {
+          let obj = this.scene.children[0];
+          this.scene.remove(obj);
+          this.disposeHierarchy(obj, this.disposeNode);
+        }
       this.robotService = null;
       this.linkmap = null;
       this.jointmap = null;
