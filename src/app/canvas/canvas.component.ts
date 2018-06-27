@@ -18,7 +18,7 @@
 */
 
 import { Component, OnInit, ElementRef, ViewChild, Renderer2,HostListener, Input,AfterViewInit, OnDestroy} from '@angular/core';
-import * as THREE from 'three';
+import * as THREE from 'three-full';
 import { HttpService } from './../services/http.service';
 import { HttpClient } from '@angular/common/http';
 import { NotFoundError } from './../common/not-foud-error';
@@ -29,8 +29,8 @@ var STLLoader = require('three-stl-loader')(THREE)
 //declare var ColladaLoader : any;
 //var ColladaLoader = require('three-collada-loader')(THREE);
 //import {ColladaLoader} from "three";
-///var coll_loader = new ColladaLoader();
-var loader = new STLLoader()
+var coll_loader = new THREE.ColladaLoader();
+var stl_loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
 import { Observable, Subject, Subscription} from 'rxjs';
@@ -175,6 +175,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         var material = link["Material"];
         var scale = link["Scale"];
         var nodel = this.createNodeLink(pos,axis,angle,scale);
+        nodel.name = name;
         if (mesh != null)
           nodel.userData = {"mesh":mesh, "scale": scale, "load": false};
         this.linkmap.set(name, nodel);
@@ -233,8 +234,14 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
                   if (ext.toUpperCase() == "STL"){
                     mesh = mesh.substr(10);
                     mesh = "/robots/"+mesh;
-                    loader.load(mesh, (geometry, id = key) => 
+                    stl_loader.load(mesh, (geometry, id = key) => 
                     {this.loadMesh(geometry,id)});
+                  }
+                  if (ext.toUpperCase() == "DAE"){
+                    mesh = mesh.substr(10);
+                    mesh = "/robots/"+mesh;
+                    coll_loader.load(mesh, (geometry, id = key) => 
+                    {this.loadCollada(geometry,id)});
                   }
               }
             } 
@@ -288,7 +295,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   
     loadMesh(geometry, id){
-
+      
       var material;
       //console.log("ID "+id);
       if (geometry.hasColors) {
@@ -313,6 +320,80 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
         my.userData["load"] = true;
+      }
+    }
+
+    loadCollada(geometry, id){
+
+      if (geometry.scene.children == null) return;
+      if (geometry.scene.children[0] == undefined) return;
+
+      console.log(geometry.scene);
+      //var material;
+      //console.log("ID "+id);
+      //if (geometry.hasColors) {
+      //    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+      //  } 
+      //  else{
+     //     material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+     //   }
+
+      //geometry.computeFaceNormals();
+     // let  mesh = new THREE.Mesh( geometry, material );
+     // material.side = THREE.DoubleSide;
+     // mesh.castShadow = true;
+     // mesh.receiveShadow = true;
+      if (this.linkmap != null){
+        let my = this.linkmap.get(id);
+        var parent = my.parent;
+        var obj = geometry.scene;
+        
+
+        console.log("NAME "+my.name);
+        
+
+          parent.add(geometry.scene.children[0]);
+
+       /* console.log("BEFORE ");
+        console.log(parent);
+        console.log(my);
+        console.log(my.children);*/
+
+
+        geometry.scene.children[0].userData = my.userData;
+      
+
+        for (var i = 0; i < my.children.length; i++) {
+          //my.children[i].parent = geometry.scene;
+          geometry.scene.children[0].add(my.children[i]);
+        }
+
+          
+        var objtodelete = this.scene.getObjectByName(my.name);
+        console.log("DELETED");
+        console.log(objtodelete);
+        this.scene.remove( objtodelete );
+
+        //geometry.scene.add(my.children);
+
+        this.linkmap.set(id,geometry.scene.children[0] );
+        
+        //console.log("AFTER ");
+        //console.log(parent);
+        //console.log( geometry.scene);
+        //console.log( geometry.scene.children);
+
+        
+
+        //geometry.scene.add(my.children);
+
+        //var scale = my.userData["scale"];
+        //if (scale != null)
+          //my.geometry.scale(scale[0],scale[1],scale[2]);
+       // my.material = mesh.material;
+        //geometry.computeFaceNormals();
+        //geometry.computeVertexNormals();
+        //my.userData["load"] = true;
       }
     }
   
