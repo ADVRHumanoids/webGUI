@@ -33,7 +33,7 @@ var STLLoader = require('three-stl-loader')(THREE)
 var loader = new STLLoader()
 import TrackballControls = THREE.TrackballControls;
 import { Scene, Vector2, Material, } from 'three';
-import { Observable, Subject} from 'rxjs';
+import { Observable, Subject, Subscription} from 'rxjs';
 import { RobotStateService } from './../services/robot-state.service';
 
 @Component({
@@ -66,41 +66,11 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     private vval: number;
     private service;
     private robotService: RobotStateService;
-    /*private robot: Map<string, any>;
-    private robotSensor: Map<string, any>;*/
     private isModelLoaded: boolean;
     private selectMaterial: any;
     private idAnimationFrame;
     private timeout;
-
-    /*private robotState = {
-      name: "",
-      id: 0,
-      motorPos: 0,
-      linkPos: 0,
-      motorVel: 0,
-      linkVel: 0,
-      temp: 0,
-      effort: 0,
-      stiff: 0,
-      damp: 0,
-      fault: 0,
-      aux : 0,
-      refPos: 0,
-      refVel: 0,
-      refTor: 0
-    }
-
-    private robotSensorState = {
-      name: "",
-      id: 0,
-      forcex: 0,
-      forcey: 0,
-      forcez: 0,
-      torquex: 0,
-      torquey: 0,
-      torquez: 0,
-    }*/
+    private sub : Subscription;
 
     constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
@@ -108,57 +78,49 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.service = new HttpService(http);
       this.service.setURL("/model");
       this.robotService = robotService;
-     /* this.robot = new Map<string, any>();
-      this.robotSensor = new Map<string, any>();
-      this.robotService.currentmsg.subscribe(msg => {	
-        this.robot = msg["robot"];
-        this.robotSensor = msg["sensor"];
-        if(this.robot != null){
-          var item = this.robot.get(this.selectJoint);
-          if (item != null)
-            this.robotState = item;
-        }
 
-        this.robotService.selectJointName = this.selectJoint;
-        if(this.isJoint)
-          this.robotService.selectJointId = this.robotState.id;
-        else
-          this.robotService.selectJointId = this.robotSensorState.id;
-          
-
-        if (this.robotSensor!= null && this.selectedObject != null){
-          var userdata = this.selectedObject.userData;
-          if (userdata != null){
-            var sensor = userdata["name"];
-            var items = this.robotSensor.get(sensor);
-            if (items != null)
-              this.robotSensorState = items;
-          }
+      this.sub = this.robotService.currentmsg.subscribe(msg => {	        
+        var robot = msg["robot"];
+        if (robot != null){
+          robot.forEach((value: any, mkey: string) => {            
+              var angle = value.motorPos;
+              var joint = this.jointmap.get(value.name);
+              var userdata = joint.userData;
+              if (userdata != null){
+                var axis = userdata["axis"];
+                if (axis != null){
+                  // console.log("SET ROT "+nameList[i]+ " axis "+ axis+ " angle "+angle);
+                  var delta = new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
+                  var origRot = userdata["quaternion"];
+                  joint.quaternion.multiplyQuaternions(origRot,delta);                  
+                  //joint.setRotationFromAxisAngle(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
+                  //joint.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),0.01);
+                }
+              }
+          });
         }
-        
-    });*/
+    });
     }
     
     createNodeLink(pos,rot_axis,angle,scale){
       
-      var tmp = new THREE.Mesh();
-      tmp.position.set( pos[0], pos[1], pos[2] );
+      var tmp = new THREE.Mesh();      
       if(rot_axis != null){
-        tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+        //tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
       }
+      tmp.position.set( pos[0], pos[1], pos[2] );
       if (scale != null)
         tmp.scale.set( 1, 1, 1 );
-
       return tmp;
     }
 
     createNodeJoint(pos,rot_axis,angle){
       
-      var tmp = new THREE.Object3D();
-      tmp.position.set( pos[0], pos[1], pos[2] );
+      var tmp = new THREE.Object3D();     
       if(rot_axis != null){
         tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
       }
+      tmp.position.set( pos[0], pos[1], pos[2] );
       return tmp;
     }
 
@@ -182,7 +144,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         var raxis = joint["Axis"];
         var nodel1 = this.createNodeJoint(pos,axis,angle);
-        nodel1.userData = {"axis": raxis, "name": name};
+        var origRot = new THREE.Quaternion().copy(nodel1.quaternion);
+        nodel1.userData = {"axis": raxis, "name": name, "quaternion": origRot };
         var clink = this.linkmap.get(child);
         var plink = this.linkmap.get(parent);
         nodel1.add(clink);
@@ -323,17 +286,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       cube.position.set(pos[0],pos[1],pos[2]);
       return cube;
     }
-
-    setVelRef(param: number){
-      
-     this.vval = param;
-     //this.selectedObject.rotateOnAxis(new THREE.Vector3(0,0,1),param);
-     /*var userdata = this.selectedObject.parent.userData;
-     if (userdata != null){
-        var axis = userdata["axis"];
-        //this.selectedObject.setRotationFromAxisAngle(new THREE.Vector3(axis[0],axis[1],axis[2]),param);
-     }*/
-    }
   
     loadMesh(geometry, id){
 
@@ -349,9 +301,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       //geometry.computeFaceNormals();
       let  mesh = new THREE.Mesh( geometry, material );
       material.side = THREE.DoubleSide;
-      //THREE.EventDispatcher.call( mesh );
-      //mesh.addEventListener('click', function(event) {alert("GOT THE EVENT");});
-      //mesh.dispatchEvent({type:'click'});
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       if (this.linkmap != null){
@@ -489,6 +438,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnDestroy() {
      
+      this.sub.unsubscribe();
       cancelAnimationFrame(this.idAnimationFrame);
       clearTimeout(this.timeout);
       window.removeEventListener('resize', this.OnWindowResize);

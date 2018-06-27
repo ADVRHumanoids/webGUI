@@ -183,24 +183,6 @@ export class RobotStateService {
             }
           }
         });
-        //var plotId = ids[i] +"/"+ 
-        //this.plotMap.get()
-       
-        //push to vector
-        //publish out
-        //this.plotAddDataMsg.next(obj);
-        /*var angle = motorList[i];
-        var joint = this.jointmap.get(nameList[i]);
-        var userdata = joint.userData;
-        if (userdata != null){
-          var axis = userdata["axis"];
-          var isloaded = joint.children[0].userData["load"];
-          if (isloaded && axis != null){
-            // console.log("SET ROT "+nameList[i]+ " axis "+ axis+ " angle "+angle);
-            //joint.setRotationFromAxisAngle(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
-            //joint.rotateOnAxis(new THREE.Vector3(axis[0],axis[1],axis[2]),angle);
-          }
-        }*/
       }
     }
     var sensors = msg["Sensors"];
