@@ -85,6 +85,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           robot.forEach((value: any, mkey: string) => {            
               var angle = value.motorPos;
               var joint = this.jointmap.get(value.name);
+              if ( joint == null) return;
               var userdata = joint.userData;
               if (userdata != null){
                 var axis = userdata["axis"];
