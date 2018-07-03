@@ -169,7 +169,7 @@
         <div  [hidden]="!isControlEnable">
 
                 <p>
-                        <input readonly style="border:none"  type="text"  size="7" value="Position:">
+                        <input readonly style="border:none" type="text"  size="7" value="Position:">
                         <mat-slider #Pos
                         class="example-margin"
                         [disabled]="disabled"
@@ -178,7 +178,9 @@
                         [step]="0.1"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
-                        [(ngModel)]="pval">
+                        [(ngModel)]="pval"
+                        (change) = "advertisePosition(robotState.name,Pos.value)"
+                        (input) = "advertisePosition(robotState.name,Pos.value)">
                         </mat-slider>
                     {{Pos.value}}
                     </p> 

@@ -20,7 +20,7 @@
 import { RobotStateService } from './services/robot-state.service';
 import { HttpService } from './services/http.service';
 import { WebsocketService } from './services/websocket.service';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppErrorHandler } from './common/app-error-handler';
 import {ErrorHandler} from '@angular/core';
@@ -50,6 +50,7 @@ import {MatTreeModule} from '@angular/material/tree';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { GestureConfig } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,8 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
      HttpService,
      WebsocketService,
      RobotStateService,
-    { provide: ErrorHandler, useClass: AppErrorHandler}
+    { provide: ErrorHandler, useClass: AppErrorHandler},
+    { provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig }
   ],
   bootstrap: [AppComponent]
 })

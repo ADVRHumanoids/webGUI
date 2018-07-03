@@ -47,6 +47,8 @@ export class RobotStateService {
   public isJoint = true;
   private JointMsg = new BehaviorSubject<any>({});
   public currentJointmsg = new Observable<any>();
+  private CtrlJointMsg = new BehaviorSubject<any>({});
+  public CtrlcurrentJointmsg = new Observable<any>();
   private barAddDataMsg = new Map<number, BehaviorSubject<any> >();
   public currentBarAddDatamsg = new Map<number,Observable<any> >();
   public currentTopicBar = "temperature";
@@ -84,6 +86,7 @@ export class RobotStateService {
     this.robotSensor = new Map<string, any>();
 
     this.registerSelectedJoint();
+    this.registerCtrlSelectedJoint();
     this.connectWebSocket();   
     this.wsService.messages.subscribe(msg => {		
       this.parseMsg(msg);
@@ -97,6 +100,10 @@ export class RobotStateService {
 
   registerSelectedJoint(){
     this.currentJointmsg = this.JointMsg.asObservable();
+  }
+
+  registerCtrlSelectedJoint(){
+    this.CtrlcurrentJointmsg = this.CtrlJointMsg.asObservable();
   }
 
   registerPlotterComponent(id, fields){
@@ -259,6 +266,10 @@ export class RobotStateService {
 
   advertiseSelectedJoint(param){
     this.JointMsg.next(param);
+  }
+
+  advertiseCtrlSelectedJoint(param){
+    this.CtrlJointMsg.next(param);
   }
 
   plotState(id, name){

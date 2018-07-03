@@ -71,6 +71,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     private idAnimationFrame;
     private timeout;
     private sub : Subscription;
+    private msgCtrl;
 
     constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
@@ -78,6 +79,12 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.service = new HttpService(http);
       this.service.setURL("/model");
       this.robotService = robotService;
+
+      this.robotService.CtrlcurrentJointmsg.subscribe(msg => {	
+        if (msg == null) return;
+        if (msg["name"] == "null") this.msgCtrl = null;
+        this.msgCtrl = msg;
+      });
 
       this.sub = this.robotService.currentmsg.subscribe(msg => {	        
         var robot = msg["robot"];
@@ -89,6 +96,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
               var userdata = joint.userData;
               if (userdata != null){
                 var axis = userdata["axis"];
+                if (this.msgCtrl!= null)
+                  if (this.msgCtrl["name"] == value.name) angle = this.msgCtrl["value"];
                 if (axis != null){
                   // console.log("SET ROT "+nameList[i]+ " axis "+ axis+ " angle "+angle);
                   var delta = new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3(axis[0],axis[1],axis[2]),angle);

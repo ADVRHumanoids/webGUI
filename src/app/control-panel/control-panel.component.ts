@@ -135,6 +135,10 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     this.robotService.addPlot(0,id,topic,name);
   }
 
+  advertisePosition(name,value){
+    var msg ={ "name":name, "value": value };
+    this.robotService.advertiseCtrlSelectedJoint(msg);
+  }
 
   setPosRef(param: number){
 
@@ -196,12 +200,15 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   setControl(){
+    
     if(this.isControlEnable){
       this.pval = this.robotState.refPos;
       this.vval = this.robotState.refVel;
       this.eval = this.robotState.refTor;
       this.sval = this.robotState.stiff;
       this.dval = this.robotState.damp;
+    }else {
+      this.advertisePosition(null,0);
     }
   }
 }
