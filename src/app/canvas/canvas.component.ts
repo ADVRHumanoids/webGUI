@@ -107,7 +107,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       
       var tmp = new THREE.Mesh();      
       if(rot_axis != null){
-        //tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
+        tmp.setRotationFromAxisAngle(new THREE.Vector3(rot_axis[0],rot_axis[1],rot_axis[2]), angle);
       }
       tmp.position.set( pos[0], pos[1], pos[2] );
       if (scale != null)
@@ -175,17 +175,20 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         var mesh = link["Mesh"];
         var material = link["Material"];
         var scale = link["Scale"];
-        var nodel = this.createNodeLink(pos,axis,angle,scale);
-        nodel.name = name;
+        var linkNode = this.createNodeLink([0,0,0],null,null,null);
+        var meshNode = this.createNodeLink(pos,axis,angle,scale);
+        meshNode.name = name;
+
         if (mesh != null)
-          nodel.userData = {"mesh":mesh, "scale": scale, "load": false};
-        this.linkmap.set(name, nodel);
+          meshNode.userData = {"mesh":mesh, "scale": scale, "load": false, "IDlink": 0,"realMesh": ""};
+        linkNode.add(meshNode);
+        this.linkmap.set(name, linkNode);
         var sensor = link["Sensor"];
         if (sensor != null){
           var marker = this.addSensorMarker([0,0,0],0.08);
-          nodel.geometry = marker.geometry;
-          nodel.material = marker.material;
-          nodel.userData = {"name":name};
+          linkNode.geometry = marker.geometry;
+          linkNode.material = marker.material;
+          linkNode.userData = {"name":name};
         }
       }
 
@@ -227,8 +230,10 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           */
            //load meshes
           this.linkmap.forEach((value: THREE.Object3D, key: string) => {
-            if(value.userData != null){
-              var mesh = <string>value.userData["mesh"];
+            var child = value.children[0];
+            if (child == null) return;
+            if(child.userData != null){
+              var mesh = <string>child.userData["mesh"];
               if (mesh != null){
                 var ext = mesh.substr(mesh.length-3);
                 if (ext != null)
@@ -312,89 +317,38 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       if (this.linkmap != null){
-        let my = <THREE.Mesh>this.linkmap.get(id);
+        var link = <THREE.Mesh>this.linkmap.get(id);
+        let my = link.children[0];
+        if (my == null) return;
         my.geometry = mesh.geometry;
+        link.userData["realMesh"] = my;
         var scale = my.userData["scale"];
         if (scale != null)
           my.geometry.scale(scale[0],scale[1],scale[2]);
         my.material = mesh.material;
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
+        my.userData["IDlink"] = id;
         my.userData["load"] = true;
       }
     }
 
     loadCollada(geometry, id){
 
-      if (geometry.scene.children == null) return;
-      if (geometry.scene.children[0] == undefined) return;
-
-      console.log(geometry.scene);
-      //var material;
-      //console.log("ID "+id);
-      //if (geometry.hasColors) {
-      //    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
-      //  } 
-      //  else{
-     //     material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
-     //   }
-
-      //geometry.computeFaceNormals();
-     // let  mesh = new THREE.Mesh( geometry, material );
-     // material.side = THREE.DoubleSide;
-     // mesh.castShadow = true;
-     // mesh.receiveShadow = true;
       if (this.linkmap != null){
         let my = this.linkmap.get(id);
-        var parent = my.parent;
+        var meshNode = my.children[0];
         var obj = geometry.scene;
+        my.add(geometry.scene);
+        geometry.scene.children[0].userData = meshNode.userData;
+        geometry.scene.children[0].userData["IDlink"] = id;
+        my.userData["realMesh"] = geometry.scene.children[0];
         
-
-        console.log("NAME "+my.name);
-        
-
-          parent.add(geometry.scene.children[0]);
-
-       /* console.log("BEFORE ");
-        console.log(parent);
-        console.log(my);
-        console.log(my.children);*/
-
-
-        geometry.scene.children[0].userData = my.userData;
-      
-
-        for (var i = 0; i < my.children.length; i++) {
-          //my.children[i].parent = geometry.scene;
-          geometry.scene.children[0].add(my.children[i]);
-        }
-
-          
-        var objtodelete = this.scene.getObjectByName(my.name);
-        console.log("DELETED");
-        console.log(objtodelete);
+        geometry.scene.position.set(meshNode.position.x, meshNode.position.y,meshNode.position.z);
+        //geometry.scene.scale.set()
+        geometry.scene.rotation.set(meshNode.rotation.x, meshNode.rotation.y,meshNode.rotation.z);          
+        var objtodelete = this.scene.getObjectByName(meshNode.name);
         this.scene.remove( objtodelete );
-
-        //geometry.scene.add(my.children);
-
-        this.linkmap.set(id,geometry.scene.children[0] );
-        
-        //console.log("AFTER ");
-        //console.log(parent);
-        //console.log( geometry.scene);
-        //console.log( geometry.scene.children);
-
-        
-
-        //geometry.scene.add(my.children);
-
-        //var scale = my.userData["scale"];
-        //if (scale != null)
-          //my.geometry.scale(scale[0],scale[1],scale[2]);
-       // my.material = mesh.material;
-        //geometry.computeFaceNormals();
-        //geometry.computeVertexNormals();
-        //my.userData["load"] = true;
       }
     }
   
@@ -582,8 +536,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         if(self.jointmap != null)
           joint = self.jointmap.get(self.robotService.selectJointSensorName)
         if (joint!= null) { 
-          self.selectedObject = joint.children[0]; 
+          self.selectedObject = joint.children[0].userData["realMesh"]; 
           self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
+         // (<THREE.Mesh>self.selectedObject).material.color.setHex(0xFFFF);
           (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
         }
         else {
@@ -606,17 +561,22 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       //console.log(this.scene.children);
       if (intersects.length > 0) {
         var objs = intersects[0].object;
-        //console.log(this.selectedObject);
-        var userdata = objs.parent.userData;
+        //console.log(objs);
+        var userdata = objs.userData;
         if (userdata != null){
-          if (this.jointmap.get(userdata["name"])!= null)
-          {                          
-            var name = userdata["name"];
-            var id =this.robotService.getJointId(name);
-            if (id != null) {
-              this.robotService.isJoint = true;
-              this.robotService.selectJointSensorName = name;
-              this.robotService.selectJointSensorId = id;
+          var link = this.linkmap.get(userdata["IDlink"]);         
+          if (link != null){
+            var jntName = link.parent.userData["name"];
+            var jnt = this.jointmap.get(jntName);
+            if (jnt!= null)
+            {                          
+              var name = jnt.userData["name"];
+              var id =this.robotService.getJointId(name);
+              if (id != null) {
+                this.robotService.isJoint = true;
+                this.robotService.selectJointSensorName = name;
+                this.robotService.selectJointSensorId = id;
+              }
             }
           }
         }
