@@ -140,6 +140,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         var name = joint["Name"];
         var child = joint["Child"];
         var parent = joint["Parent"];
+        var limits = joint["Limits"];
+        var limit = {"llim": limits[0], "ulim":limits[1], "efflim": limits[2], "vellim": limits[3]};
+        this.robotService.limits.set(name, limit);
         var pos = joint["Pos"];
         if (pos == null) pos = [0,0,0];
         var rot = joint["Rot"];

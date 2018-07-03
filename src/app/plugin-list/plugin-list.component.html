@@ -1,5 +1,6 @@
 <p>
-
+<button type="button" (click)="onMaster('web')">Set WEB Master</button> 
+<button type="button" (click)="onMaster('ros')">Set ROS Master</button> 
 </p>
 <li *ngFor="let item of plugins"> {{item.Name}} {{item.Status}}
     <button type="button" (click)="onStart(item.Name)">Start</button> 

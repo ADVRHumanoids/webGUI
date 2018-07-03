@@ -15,12 +15,14 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.sub1.unsubscribe();
     this.robot = null;
     this.robotService = null;
     this.robotSensor = null;
   }
 
   private sub : Subscription;
+  private sub1 : Subscription;
 
   public type = "range";
   private service;
@@ -30,6 +32,13 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   private eval = 0.0;
   private sval = 0.0;
   private dval = 0.0;
+
+  public limit = {
+    llim: 0, 
+    ulim:0, 
+    efflim: 0,
+    vellim: 0
+  }
 
   private robotState = {
     name: "",
@@ -73,7 +82,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     this.service = new HttpService(http);
     this.service.setURL("/singlejoint");
 
-    this.robotService.currentJointmsg.subscribe(msg => {	
+    this.sub1 = this.robotService.currentJointmsg.subscribe(msg => {	
       this.setControl();
     });
 
@@ -85,6 +94,9 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
         if (item != null){
           this.robotState = item;
           this.isJoint = true;
+          var limit = this.robotService.limits.get(this.robotService.selectJointSensorName);
+          if (limit != null)
+            this.limit = limit;
         }
       }
 

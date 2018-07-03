@@ -99,9 +99,9 @@
                         <mat-slider #PosOFF
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
-                        [step]="step"
+                        [max]="limit.ulim"
+                        [min]="limit.llim"
+                        [step]="0.1"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
                         [(ngModel)]="robotState.refPos">
@@ -113,8 +113,8 @@
                         <mat-slider #VelOFF
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
+                        [max]="limit.vellim"
+                        [min]="-limit.vellim"
                         [step]="step"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
@@ -127,8 +127,8 @@
                         <mat-slider #TorqueOFF
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
+                        [max]="limit.efflim"
+                        [min]="-limit.efflim"
                         [step]="step"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
@@ -173,8 +173,8 @@
                         <mat-slider #Pos
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
+                        [max]="limit.ulim"
+                        [min]="limit.llim"
                         [step]="0.1"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
@@ -189,8 +189,8 @@
                         <mat-slider #Vel
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
+                        [max]="limit.vellim"
+                        [min]="-limit.vellim"
                         [step]="0.1"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"
@@ -203,8 +203,8 @@
                         <mat-slider #Torque
                         class="example-margin"
                         [disabled]="disabled"
-                        [max]="max"
-                        [min]="min"
+                        [max]="limit.efflim"
+                        [min]="-limit.efflim"
                         [step]="0.1"
                         [thumbLabel]="false"
                         [tickInterval]="tickInterval"

@@ -53,6 +53,8 @@ export class RobotStateService {
   public currentBarAddDatamsg = new Map<number,Observable<any> >();
   public currentTopicBar = "temperature";
 
+  public limits = new Map<string, any>();
+
   public CanvasState = {
     scene : null,
     camera : null,

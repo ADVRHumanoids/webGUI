@@ -155,5 +155,28 @@ export class PluginListComponent implements OnInit {
        });
   }
   
+  onMaster(param){
+    
+    this.service.get("/master?"+param)
+    .subscribe(
+    response => {
+      
+
+    },
+    (error: AppError) => {
+
+      //rimovo dal vettore
+      
+      if (error instanceof NotFoundError){
+        //expected error
+        //deleted
+        //this.form.setErrors(error.json());
+      }
+      else{
+        //unexpected error
+        throw error;
+      }      
+      });    
+  }
 
 }
