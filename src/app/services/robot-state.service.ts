@@ -156,7 +156,8 @@ export class RobotStateService {
 
       //var barTopic = robot[this.currentTopicBar];
       //if (barTopic != null)
-      this.barAddDataMsg.get(0).next({"robot":robot,"topic":this.currentTopicBar});
+      if (this.currentBarAddDatamsg.get(0)!= null)
+        this.barAddDataMsg.get(0).next({"robot":robot,"topic":this.currentTopicBar});
 
       for (let i = 0; i < nameList.length ; i++) {
         var obj = {
