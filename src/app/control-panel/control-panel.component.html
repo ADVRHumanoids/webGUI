@@ -55,26 +55,32 @@
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'effort',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
-            <input readonly style="border:none" type="text" name="clock" size="7" value="Fault:">
 
-            <input  disabled matInput style="width: 50px;" value={{robotState.fault}}> 
-            <button mat-icon-button type="button" (click)="addPlot(robotState.id,'fault',robotState.name)">
-                <mat-icon aria-label="Plot">show_chart</mat-icon>
-            </button>
-        </p>
-
-        <p>
             <input readonly style="border:none" type="text" name="clock" size="7" value="Temperature:">  
             <input  disabled matInput style="width: 50px;" value={{robotState.temp}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'temp',robotState.name)">
              <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
-            <input readonly style="border:none" type="text" name="clock" size="7" value="Aux:">
+        </p>
 
+        <p>            
+            <input readonly style="border:none" type="text" name="clock" size="7" value="Aux:">
             <input  disabled matInput style="width: 50px;" value={{robotState.aux}}> 
             <button mat-icon-button type="button" (click)="addPlot(robotState.id,'aux',robotState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
+        </p>
+
+        <p>
+        <input readonly style="border:none" type="text" name="clock" size="7" value="Fault:">
+        <!--<input  disabled matInput style="width: 250px;" value={{robotState.fault}}> -->
+        <textarea disabled  matInput
+            cdkTextareaAutosize
+            #autosize="cdkTextareaAutosize"
+            cdkAutosizeMinRows="2"
+            cdkAutosizeMaxRows="5"
+            value={{robotState.fault}}>
+        </textarea>
         </p>
     </mat-card-content>
   </mat-card>

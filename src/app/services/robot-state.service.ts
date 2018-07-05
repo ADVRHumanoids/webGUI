@@ -148,7 +148,7 @@ export class RobotStateService {
       var efforts = robot["effort"];
       var stiffs = robot["stiffness"];
       var damps = robot["damping"];
-      var faults = robot["fault"];
+      var faults = robot["fault_string"];
       var posrefs = robot["pos_ref"];
       var velrefs = robot["vel_ref"];
       var torrefs = robot["eff_ref"];

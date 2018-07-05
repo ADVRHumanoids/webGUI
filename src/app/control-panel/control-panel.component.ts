@@ -51,7 +51,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     effort: 0,
     stiff: 0,
     damp: 0,
-    fault: 0,
+    fault: "",
     aux : 0,
     refPos: 0,
     refVel: 0,

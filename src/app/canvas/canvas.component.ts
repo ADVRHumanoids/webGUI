@@ -72,6 +72,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     private timeout;
     private sub : Subscription;
     private msgCtrl;
+    private faultMap = new Map<string,string>();
 
     constructor(http: HttpClient, robotService: RobotStateService) { 
       console.log(THREE);
@@ -93,6 +94,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
               var angle = value.motorPos;
               var joint = this.jointmap.get(value.name);
               if ( joint == null) return;
+              this.faultMap.set(value.name,value.fault);              
               var userdata = joint.userData;
               if (userdata != null){
                 var axis = userdata["axis"];
@@ -544,14 +546,24 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         if (self.selectedObject != null){
           (<THREE.Mesh>self.selectedObject).material = self.selectMaterial;
         }
+        self.faultMap.forEach((value: string, key: string) => { 
+          var jnt = self.jointmap.get(key);
+          var mesh = jnt.children[0].userData["realMesh"]; 
+          if (value != ""){            
+            if (mesh != null)
+              (<THREE.Mesh>mesh).material = new THREE.MeshPhongMaterial( { color: 0xFF545E, specular: 0x111111, shininess: 200 } );
+          }else{
+            if (mesh != null)
+              (<THREE.Mesh>mesh).material.color.setHex(0xAAAAAA);
+          }
+        });
         var joint = null;
         if(self.jointmap != null)
-          joint = self.jointmap.get(self.robotService.selectJointSensorName)
-        if (joint!= null) { 
+          joint = self.jointmap.get(self.robotService.selectJointSensorName);
+        if (joint!= null) {      
           self.selectedObject = joint.children[0].userData["realMesh"]; 
           self.selectMaterial = (<THREE.Mesh>self.selectedObject).material;
-         // (<THREE.Mesh>self.selectedObject).material.color.setHex(0xFFFF);
-          (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );
+          (<THREE.Mesh>self.selectedObject).material = new THREE.MeshPhongMaterial( { color: 0xFFFF, specular: 0x111111, shininess: 200 } );   
         }
         else {
           var sensor = null;
