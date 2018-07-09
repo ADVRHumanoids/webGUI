@@ -57,6 +57,12 @@ export class RobotStateService {
   private sub : Subscription;
   public limits = new Map<string, any>();
 
+  public modelViewFlag = true;
+  public plotterViewFlag = false;
+  public allPlotsViewFlag = false;
+  public controlPanelViewFlag = false;
+  public toggleModel = "Model";
+
   public CanvasState = {
     scene : null,
     camera : null,
@@ -66,6 +72,26 @@ export class RobotStateService {
     renderer: null,
     state: 0
   };
+
+  public changeView(param){
+    //console.log("enableModelView"+ param);
+    if (param == "Model"){
+      this.modelViewFlag = true;
+      this.plotterViewFlag = false;
+      this.allPlotsViewFlag = false;
+    }
+    else if (param == "Plotter"){
+      this.plotterViewFlag = true;
+      this.modelViewFlag = false;
+      this.allPlotsViewFlag = false;
+    }
+    else if (param == "AllPlots"){
+      this.plotterViewFlag = false;
+      this.allPlotsViewFlag = true;
+      this.modelViewFlag = false;
+    }
+    this.toggleModel = param;
+  }
 
   onError(err){
     console.log("WebSocket Error occur ");
@@ -180,19 +206,19 @@ export class RobotStateService {
         var obj = {
           name: nameList[i],
           id: ids[i],
-          motorPos: motors[i],
-          linkPos: links[i],
-          motorVel: motorsv[i],
-          linkVel: linksv[i],
+          motorPos: Math.round(motors[i] * 100) / 100,
+          linkPos: Math.round(links[i] * 100) / 100,
+          motorVel: Math.round(motorsv[i] * 100) / 100,
+          linkVel: Math.round(linksv[i] * 100) / 100,
           temp: temps[i],
-          effort: efforts[i],
-          stiff: stiffs[i],
-          damp: damps[i],
+          effort: Math.round(efforts[i] * 100) / 100,
+          stiff: Math.round(stiffs[i] * 100) / 100,
+          damp: Math.round(damps[i] * 100) / 100,
           fault: faults[i],
-          aux: auxs[i],
-          refPos: posrefs[i],
-          refVel: velrefs[i],
-          refTor: torrefs[i]
+          aux: Math.round(auxs[i] * 100) / 100,
+          refPos: Math.round(posrefs[i] * 100) / 100,
+          refVel: Math.round(velrefs[i] * 100) / 100,
+          refTor: Math.round(torrefs[i] * 100) / 100
         };
         this.robot.set(nameList[i], obj);
         var keys =  Object.keys(obj);
@@ -214,18 +240,20 @@ export class RobotStateService {
     }
     var sensors = msg["Sensors"];
     if (sensors != null){
-      var nameList = sensors["ft_name"];
-      var ids = sensors["ft_id"];
-      var forces = sensors["force"];
-      var torques = sensors["torque"];
+      var fts = sensors["fts"];
+      var nameList = fts["ft_name"];
+      var ids = fts["ft_id"];
+      var forces = fts["force"];
+      var torques = fts["torque"];
       var forcesv = [0,0,0];
       var torquesv = [0,0,0];
       for (let i = 0; i < nameList.length ; i++) {
         if(forces != null)
           forcesv = forces[i]["Vector"];
-        if(forces != null)
+        if(torques != null)
           torquesv = torques[i]["Vector"];
         var objs = {
+          type : "ft",
           name: nameList[i],
           id: ids[i],
           forcex: forcesv[0],
@@ -244,6 +272,55 @@ export class RobotStateService {
               var topic = value.get(ids[i]+"/"+key);
               if (topic != null){
                 var pobj = {"name": ids[i]+"/"+key , "value": objs[topic]};
+                var array = this.plotArrayMap.get(mkey);
+                if( array != null)
+                  array.push(pobj);
+              }
+            }
+          }
+        });
+      }
+      //IMU
+      var imus = sensors["imus"];
+      var nameList = imus["imu_name"];
+      var ids = imus["imu_id"];
+      var ang_vel = imus["ang_vel"];
+      var lin_acc = imus["lin_acc"];
+      var orientation = imus["orientation"];
+      var ang_velv = [0,0,0];
+      var lin_accv = [0,0,0];
+      var orientationv = [0,0,0,0];
+      for (let i = 0; i < nameList.length ; i++) {
+        if(ang_vel != null)
+          ang_velv = ang_vel[i]["Vector"];
+        if(lin_acc != null)
+          lin_accv = lin_acc[i]["Vector"];
+        if(orientation != null)
+          orientationv = orientation[i]["Vector"];
+        var objimu = {
+          type : "imu",
+          name: nameList[i],
+          id: ids[i],
+          ang_velx: ang_velv[0],
+          ang_vely: ang_velv[1],
+          ang_velz: ang_velv[2],
+          lin_accx: lin_accv[0],
+          lin_accy: lin_accv[1],
+          lin_accz: lin_accv[2],
+          orientationx: orientationv[0],
+          orientationy: orientationv[1],
+          orientationz: orientationv[2],
+          orientationw: orientationv[3]
+        };
+        this.robotSensor.set(nameList[i], objimu);
+        var keys =  Object.keys(objimu);
+        this.plotMap.forEach((value: Map<string,string>, mkey: number) => {
+          //var plotItem = this.plotMap.get(1);
+          if (value != null){
+            for (let key of keys){
+              var topic = value.get(ids[i]+"/"+key);
+              if (topic != null){
+                var pobj = {"name": ids[i]+"/"+key , "value": objimu[topic]};
                 var array = this.plotArrayMap.get(mkey);
                 if( array != null)
                   array.push(pobj);

@@ -188,7 +188,7 @@
                         (change) = "advertisePosition(robotState.name,Pos.value)"
                         (input) = "advertisePosition(robotState.name,Pos.value)">
                         </mat-slider>
-                    {{Pos.value}}
+                        <input matInput type="number" [max]="limit.ulim" [min]="limit.llim" step="0.1" placeholder="Value" (change) = "advertisePosition(robotState.name,Pos.value)" [(ngModel)]="Pos.value">
                     </p> 
                     <p>
                         <input readonly style="border:none"  type="text"  size="7" value="Velocity:">
@@ -202,10 +202,10 @@
                         [tickInterval]="tickInterval"
                         [(ngModel)]="vval">
                     </mat-slider>
-                    {{Vel.value}}
+                    <input matInput type="number" [max]="limit.vellim" [min]="-limit.vellim" step="0.1" placeholder="Value" [(ngModel)]="Vel.value">
                     </p>
                     <p>
-                        <input readonly style="border:none"  type="text"  size="7" value="Torque:">
+                        <input readonly style="border:none" step="0.1" type="text"  size="7" value="Torque:">
                         <mat-slider #Torque
                         class="example-margin"
                         [disabled]="disabled"
@@ -216,7 +216,7 @@
                         [tickInterval]="tickInterval"
                         [(ngModel)]="eval">
                     </mat-slider>
-                    {{Torque.value}}
+                    <input matInput type="number" [max]="limit.efflim" [min]="-limit.efflim" placeholder="Value" [(ngModel)]="Torque.value">
                     </p> 
                     <p>
                         <input readonly style="border:none" type="text"  size="7" value="Stiffness:">
@@ -230,7 +230,7 @@
                         [tickInterval]="tickInterval"
                         [(ngModel)]="sval">
                     </mat-slider>
-                    {{Stiff.value}}
+                    <input matInput type="number"  [max]="10000.0" [min]="0" step="1" placeholder="Value" [(ngModel)]="Stiff.value">
                     </p>
                     <p>
                         <input readonly style="border:none"  type="text"  size="7" value="Damping:">
@@ -244,7 +244,7 @@
                         [tickInterval]="tickInterval"
                         [(ngModel)]="dval">
                     </mat-slider>
-                    {{Damp.value}}
+                    <input matInput type="number" [max]="10000.0" [min]="0" step="1" step="1" placeholder="Value" [(ngModel)]="Damp.value">
                     </p>  
         </div>
 
@@ -254,53 +254,130 @@
 </div>
 
 
-<ng-template #sensor>
+<ng-template #imu>
     <mat-card class="example-card">
     <mat-card-header>
         <mat-card-title>
-            <input readonly style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorState.id}}">
-            <input readonly style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorState.name}}">           
+            <input readonly style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorIMUState.id}}">
+            <input readonly style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorIMUState.name}}">           
         </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-    <p>Force: </p>
+    <p>Angular velocity: </p>
         <p>
             <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="x:">
 
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcex}}>
-            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcex',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.ang_velx}}>
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'ang_velx',robotSensorIMUState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button> 
             <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcey}}>
-            <button mat-icon-button  type="button" (click)="addPlot(robotSensorState.id,'forcey',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.ang_vely}}>
+            <button mat-icon-button  type="button" (click)="addPlot(robotSensorIMUState.id,'ang_vely',robotSensorIMUState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
             <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.forcez}}> 
-            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'forcez',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.ang_velz}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'ang_velz',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+    <p>Linear acceleration:</p>
+        <p>
+            <input readonly style="border:none; width: 20px" type="text" value="x:"> 
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.lin_accx}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'lin_accx',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.lin_accy}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'lin_accy',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.lin_accz}}>  
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'lin_accz',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon></button>      
+        </p>
+        <p>Orientation:</p>
+        <p>
+            <input readonly style="border:none; width: 20px" type="text" value="x:"> 
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.orientationx}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'orientationx',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.orientationy}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'orientationy',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+        </p>
+        <p>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.orientationz}}>  
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'orientationz',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon></button> 
+
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="w:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorIMUState.orientationw}}>  
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorIMUState.id,'orientationw',robotSensorIMUState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon></button>       
+        </p>
+    </mat-card-content>
+</mat-card>
+</ng-template>
+
+<ng-template #ft>
+    <mat-card class="example-card">
+    <mat-card-header>
+        <mat-card-title>
+            <input readonly style="border:none" type="text" name="clock" size="2" value="ID: {{robotSensorFTState.id}}">
+            <input readonly style="border:none" type="text" name="clock" size="15" value="Name: {{robotSensorFTState.name}}">           
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>Force: </p>
+        <p>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="x:">
+
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.forcex}}>
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorFTState.id,'forcex',robotSensorFTState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button> 
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.forcey}}>
+            <button mat-icon-button  type="button" (click)="addPlot(robotSensorFTState.id,'forcey',robotSensorFTState.name)">
+                <mat-icon aria-label="Plot">show_chart</mat-icon>
+            </button>
+            <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.forcez}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorFTState.id,'forcez',robotSensorFTState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
         </p>
     <p>Torque:</p>
         <p>
             <input readonly style="border:none; width: 20px" type="text" value="x:"> 
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquex}}> 
-            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquex',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.torquex}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorFTState.id,'torquex',robotSensorFTState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
             <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="y:">
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquey}}> 
-            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquey',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.torquey}}> 
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorFTState.id,'torquey',robotSensorFTState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon>
             </button>
             <input readonly style="border:none; width: 20px" type="text" name="clock" size="1" value="z:">
-            <input  disabled matInput style="width: 50px;" value={{robotSensorState.torquez}}>  
-            <button mat-icon-button type="button" (click)="addPlot(robotSensorState.id,'torquez',robotSensorState.name)">
+            <input  disabled matInput style="width: 50px;" value={{robotSensorFTState.torquez}}>  
+            <button mat-icon-button type="button" (click)="addPlot(robotSensorFTState.id,'torquez',robotSensorFTState.name)">
                 <mat-icon aria-label="Plot">show_chart</mat-icon></button>      
         </p>
-        </mat-card-content>
+    </mat-card-content>
     </mat-card>
+</ng-template>
+
+<ng-template #sensor>
+    <div *ngIf="sensorType=='ft' then ft; else imu"></div>
 </ng-template>
       
 <ng-template #ControlOFF>

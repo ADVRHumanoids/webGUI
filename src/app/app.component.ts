@@ -25,6 +25,8 @@ import { ControlPanelComponent } from './control-panel/control-panel.component';
 import { TreePanelComponent } from './tree-panel/tree-panel.component';
 import { Component} from '@angular/core';
 import { MatTabChangeEvent } from '@angular/material';
+import { RobotStateService } from './services/robot-state.service';
+
 
 @Component({
   selector: 'app-root',
@@ -33,42 +35,23 @@ import { MatTabChangeEvent } from '@angular/material';
 })
 export class AppComponent {
   
-  public modelViewFlag = true;
-  public plotterViewFlag = false;
-  public allPlotsViewFlag = false;
-  public controlPanelViewFlag = false;
+
   public tabIndex = 0;
   public toggleGlobal = "Global";
-  public toggleModel = "Model";
+  private robotService: RobotStateService;
 
-  changeView(param){
-    //console.log("enableModelView"+ param);
-    if (param == "Model"){
-      this.modelViewFlag = true;
-      this.plotterViewFlag = false;
-      this.allPlotsViewFlag = false;
-    }
-    else if (param == "Plotter"){
-      this.plotterViewFlag = true;
-      this.modelViewFlag = false;
-      this.allPlotsViewFlag = false;
-    }
-    else if (param == "AllPlots"){
-      this.plotterViewFlag = false;
-      this.allPlotsViewFlag = true;
-      this.modelViewFlag = false;
-    }
-    this.toggleModel = param;
+  constructor(robotService: RobotStateService){
+    this.robotService =  robotService;
   }
 
   changeViewPanel(param){
     //console.log("enableModelView"+ param);
     this.toggleGlobal = param;
     if (param == "Global"){
-      this.controlPanelViewFlag = false;
+      this.robotService.controlPanelViewFlag = false;
     }
     else if (param == "Single"){
-      this.controlPanelViewFlag = true;
+      this.robotService.controlPanelViewFlag = true;
     }
   }
 
