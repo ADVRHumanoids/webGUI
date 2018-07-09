@@ -47,7 +47,10 @@ export class FileDatabase {
         var robot = response["Robot"];
         var joints = robot["joint_name"];
         var sensors = response["Sensors"];
-        var ft = sensors["ft_name"];
+        var fts = sensors["fts"];
+        var ft = fts["ft_name"];
+        var imus = sensors["imus"];
+        var imu = imus["imu_name"];
 
         /*var obj = {
 
@@ -69,7 +72,7 @@ export class FileDatabase {
 
         var obj = {
             "Robot":  joints,
-            "Sensor": ft        
+            "Sensor": {"fts": ft,"imus": imu}        
         };
         var stringjson = JSON.stringify(obj);
         const dataObject = JSON.parse(stringjson);
@@ -136,6 +139,7 @@ export class TreePanelComponent implements OnInit {
   public selectedDevice="";
   public jointId;
   public isJoint= true;
+  private timeout;
 
   ngOnInit(){
   }
@@ -157,7 +161,10 @@ export class TreePanelComponent implements OnInit {
 
   plotState(id, name){
     if(this.isJoint){
-      this.robotService.plotState(this.robotService.selectJointSensorId,this.robotService.selectJointSensorName);
+      this.robotService.changeView("AllPlots"); 
+      this.timeout = setTimeout(()=>{ 
+        this.robotService.plotState(this.robotService.selectJointSensorId,this.robotService.selectJointSensorName);
+      },200);  
     }
   }
 

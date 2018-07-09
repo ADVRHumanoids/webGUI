@@ -14,6 +14,7 @@ import { HttpService } from './../services/http.service';
 export class ControlPanelComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
+    clearTimeout(this.timeout);
     this.sub.unsubscribe();
     this.sub1.unsubscribe();
     this.robot = null;
@@ -23,6 +24,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   private sub : Subscription;
   private sub1 : Subscription;
+  private timeout;
 
   public type = "range";
   private service;
@@ -58,7 +60,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     refTor: 0
   }
 
-  private robotSensorState = {
+  private robotSensorFTState = {
     name: "",
     id: 0,
     forcex: 0,
@@ -69,7 +71,23 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     torquez: 0,
   }
 
+  private robotSensorIMUState = {
+    name: "",
+    id: 0,
+    ang_velx: 0,
+    ang_vely: 0,
+    ang_velz: 0,
+    lin_accx: 0,
+    lin_accy: 0,
+    lin_accz: 0,
+    orientationx: 0,
+    orientationy: 0,
+    orientationz: 0,
+    orientationw: 0
+  }
+
   public isJoint = true;
+  public sensorType = "";
   private robotService: RobotStateService;
   private robot: Map<string, any>;
   private robotSensor: Map<string, any>;
@@ -103,7 +121,11 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       if (this.robotSensor!= null && !this.robotService.isJoint){
           var items = this.robotSensor.get(this.robotService.selectJointSensorName);
           if (items != null){
-            this.robotSensorState = items;
+            this.sensorType = items.type;
+            if (items.type == "ft")
+              this.robotSensorFTState = items;
+            else if (items.type == "imu")
+              this.robotSensorIMUState = items;
             this.isJoint = false;
           }
       }
@@ -144,7 +166,10 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   addPlot(id, topic, name){
-    this.robotService.addPlot(0,id,topic,name);
+    this.robotService.changeView("Plotter");
+    this.timeout = setTimeout(()=>{ 
+      this.robotService.addPlot(0,id,topic,name);
+    },200);    
   }
 
   advertisePosition(name,value){

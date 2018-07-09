@@ -2,12 +2,12 @@
 
 <mat-toolbar color="primary">
     <span>ROBOT WEB GUI</span>
-    <mat-button-toggle-group *ngIf="tabIndex==0" [(ngModel)]="toggleGlobal" style="margin-left: 50px;" #group="matButtonToggleGroup" name="mode" aria-label="Font Style" (change)="changeView(group.value)">
+    <mat-button-toggle-group *ngIf="tabIndex==0" [(ngModel)]="robotService.toggleModel" style="margin-left: 50px;" #group="matButtonToggleGroup" name="mode" aria-label="Font Style" (change)="robotService.changeView(group.value)">
         <mat-button-toggle value="Plotter">Plotter</mat-button-toggle>
         <mat-button-toggle value="Model">Model</mat-button-toggle>
         <mat-button-toggle value="AllPlots">4Plots</mat-button-toggle>
     </mat-button-toggle-group>
-    <mat-button-toggle-group *ngIf="tabIndex==0 && !allPlotsViewFlag" [(ngModel)]="toggleModel" style="margin-left: 50px;" #groupPanel="matButtonToggleGroup" name="modePanel" aria-label="Font Style" (change)="changeViewPanel(groupPanel.value)">
+    <mat-button-toggle-group *ngIf="tabIndex==0 && !robotService.allPlotsViewFlag" [(ngModel)]="toggleGlobal" style="margin-left: 50px;" #groupPanel="matButtonToggleGroup" name="modePanel" aria-label="Font Style" (change)="changeViewPanel(groupPanel.value)">
         <mat-button-toggle value="Global">Global</mat-button-toggle>
         <mat-button-toggle value="Single">Single</mat-button-toggle>
         </mat-button-toggle-group>
@@ -41,7 +41,7 @@
                 fxLayoutAlign="center stretch"
                 fxLayoutGap="2px"
                 fxLayoutGap.xs="0">
-                    <div  *ngIf="allPlotsViewFlag; then LeftPlotView else controlPanelView"></div>
+                    <div  *ngIf="robotService.allPlotsViewFlag; then LeftPlotView else controlPanelView"></div>
                 </div>       
             </div>
             <div class="item item-3"  fxFlex="40" >
@@ -52,9 +52,9 @@
                   fxLayoutAlign="center stretch"
                   fxLayoutGap="2px"
                   fxLayoutGap.xs="0">
-                    <div  *ngIf="plotterViewFlag; then plotterView"></div>
-                    <div  *ngIf="modelViewFlag; then modelView"></div>
-                    <div  *ngIf="allPlotsViewFlag; then twoPlotView"></div>
+                    <div  *ngIf="robotService.plotterViewFlag; then plotterView"></div>
+                    <div  *ngIf="robotService.modelViewFlag; then modelView"></div>
+                    <div  *ngIf="robotService.allPlotsViewFlag; then twoPlotView"></div>
                   </div>
                 </div> 
             </div>
@@ -77,10 +77,10 @@
 
 <ng-template #controlPanelView>
     <div class="item item-1"  fxFlexFill >
-        <div *ngIf="controlPanelViewFlag== false" style=" height:100%">
+        <div *ngIf="robotService.controlPanelViewFlag== false" style=" height:100%">
             <app-bar-chart  idPlot="0" ></app-bar-chart>
         </div> 
-        <div *ngIf="controlPanelViewFlag== true" style=" height:100%">
+        <div *ngIf="robotService.controlPanelViewFlag== true" style=" height:100%">
             <app-control-panel></app-control-panel>
         </div> 
     </div>
