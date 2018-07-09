@@ -39,7 +39,6 @@ export class AppComponent {
   public tabIndex = 0;
   public toggleGlobal = "Global";
   public robotService: RobotStateService;
-
   constructor(robotService: RobotStateService){
     this.robotService =  robotService;
   }
