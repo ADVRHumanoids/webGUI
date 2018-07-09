@@ -51,6 +51,7 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { GestureConfig } from '@angular/material';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -80,7 +81,8 @@ import { GestureConfig } from '@angular/material';
     MatButtonToggleModule,
     MatTreeModule,
     MatSliderModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatSnackBarModule
   ],
   providers: [
      HttpService,

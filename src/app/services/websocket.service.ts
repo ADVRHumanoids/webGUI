@@ -21,29 +21,35 @@ import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import * as Rx from 'rxjs';
 import { Observable, Subject } from 'rxjs';
+import {MatSnackBar} from '@angular/material';
 
 @Injectable()
 export class WebsocketService {
 
-  constructor() { }
+  constructor(public snackBar: MatSnackBar) { }
 
     private subject: Rx.Subject<MessageEvent>;
     public messages: Subject<any>;
   
     private connectInternal(url): Rx.Subject<MessageEvent> {
-      if (!this.subject) {
         this.subject = this.create(url);
-        console.log("Successfully connected: " + url);
-      } 
       return this.subject;
     }
   
+    onOpen(){
+      console.log("Successfully connected: ");
+      this.snackBar.open("ON-LINE",null,{
+        duration: 3000});
+    }
+
     private create(url): Rx.Subject<MessageEvent> {
 
       let ws = new WebSocket(url);
+      ws.onopen = () => this.onOpen();
 
       let observable = Rx.Observable.create(
           (obs: Rx.Observer<MessageEvent>) => {
+          //ws.onopen.bind(this.onOpen);
           ws.onmessage = obs.next.bind(obs);
           ws.onerror = obs.error.bind(obs);
           ws.onclose = obs.complete.bind(obs);

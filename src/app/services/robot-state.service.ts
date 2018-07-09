@@ -19,9 +19,10 @@
 
 import { Injectable } from '@angular/core';
 import * as Rx from 'rxjs';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { WebsocketService } from './websocket.service';
 import {BehaviorSubject} from 'rxjs';
+import {MatSnackBar} from '@angular/material';
 
 @Injectable()
 export class RobotStateService {
@@ -43,7 +44,7 @@ export class RobotStateService {
   public currentClearmsg = new Map<number,Observable<any> >();
   public selectJointSensorName = "";
   public selectJointSensorId = 0;
-  private interval;
+  private timeout;
   public isJoint = true;
   private JointMsg = new BehaviorSubject<any>({});
   public currentJointmsg = new Observable<any>();
@@ -52,7 +53,8 @@ export class RobotStateService {
   private barAddDataMsg = new Map<number, BehaviorSubject<any> >();
   public currentBarAddDatamsg = new Map<number,Observable<any> >();
   public currentTopicBar = "temperature";
-
+  private connectionAttempt = 5;
+  private sub : Subscription;
   public limits = new Map<string, any>();
 
   public CanvasState = {
@@ -66,34 +68,49 @@ export class RobotStateService {
   };
 
   onError(err){
-    console.log("WebSocket Error occur "+err);
+    console.log("WebSocket Error occur ");
+    console.log(err);
+    this.snackBar.open("OFF-LINE",null,{
+      duration: 3000});
+    this.sub.unsubscribe();
+    this.reconnect();
+  }
+
+  reconnect(){
+    this.timeout = setTimeout(()=>{
+      console.log("WebSocket reconnect attempt");
+      this.connectWebSocket();     
+    },5000);
   }
 
   onClose(){
     console.log("WebSocket closed by server");
+    this.snackBar.open("OFF-LINE",null,{
+      duration: 3000});
+    this.sub.unsubscribe();
+    this.reconnect();
   }
 
   connectWebSocket(){
     console.log("WebSocket trying connect");
-    clearInterval(this.interval);
+    clearTimeout(this.timeout);
     var ip = window.location.origin;
     ip = ip.substr(7);
     var WS_URL = "ws://"+ip+"/websocket";
     this.wsService.connect(WS_URL);
+    this.sub = this.wsService.messages.subscribe(msg => {		
+      this.parseMsg(msg);
+      this.sendMsg();
+     },(err) => this.onError(err), () => this.onClose());
   }
 
-  constructor(private wsService: WebsocketService) { 
+  constructor(private wsService: WebsocketService, public snackBar: MatSnackBar) { 
 
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
-
     this.registerSelectedJoint();
     this.registerCtrlSelectedJoint();
-    this.connectWebSocket();   
-    this.wsService.messages.subscribe(msg => {		
-      this.parseMsg(msg);
-      this.sendMsg();
-     },this.onError, this.onClose);
+    this.connectWebSocket();       
   }
   
   publishMsg(msg){
