@@ -90,10 +90,10 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.sub = this.robotService.currentmsg.subscribe(msg => {	        
         var robot = msg["robot"];
         if (robot != null){
-          robot.forEach((value: any, mkey: string) => {            
+          robot.forEach((value: any, mkey: string) => {  
               var angle = value.motorPos;
               var joint = this.jointmap.get(value.name);
-              if ( joint == null) return;
+              if ( joint == null) return;              
               this.faultMap.set(value.name,value.fault);              
               var userdata = joint.userData;
               if (userdata != null){
@@ -380,7 +380,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   
       var status = false;
       //Load state
-      if (this.robotService.CanvasState.state != 0){
+      if (this.robotService.CanvasState.state == 1){
         if (this.robotService.CanvasState.camera != null)
           this.camera = this.robotService.CanvasState.camera;
         if (this.robotService.CanvasState.controls != null)
@@ -427,7 +427,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
     OnWindowResize = EventListener => {
       this.resize();
-      this.render();
     }
 
     Onclick = MouseEvent =>{
@@ -489,7 +488,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy() {
      
       this.sub.unsubscribe();
-      cancelAnimationFrame(this.idAnimationFrame);
+      var id = cancelAnimationFrame(this.idAnimationFrame);
       clearTimeout(this.timeout);
       window.removeEventListener('resize', this.OnWindowResize);
       this.container.removeEventListener('click',this.Onclick);
@@ -547,14 +546,17 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           (<THREE.Mesh>self.selectedObject).material = self.selectMaterial;
         }
         self.faultMap.forEach((value: string, key: string) => { 
+          if (self.jointmap == null) return;
           var jnt = self.jointmap.get(key);
           var mesh = jnt.children[0].userData["realMesh"]; 
           if (value != ""){            
             if (mesh != null)
-              (<THREE.Mesh>mesh).material = new THREE.MeshPhongMaterial( { color: 0xFF545E, specular: 0x111111, shininess: 200 } );
+              (<THREE.Mesh>mesh).material.color.setHex(0xFF545E);
+              //(<THREE.Mesh>mesh).material = new THREE.MeshPhongMaterial( { color: 0xFF545E, specular: 0x111111, shininess: 200 } );
           }else{
             if (mesh != null)
-              (<THREE.Mesh>mesh).material.color.setHex(0xAAAAAA);
+              (<THREE.Mesh>mesh).material.color.setHex(0xAAAAAA); 
+            //self.faultMap.delete(value);            
           }
         });
         var joint = null;
