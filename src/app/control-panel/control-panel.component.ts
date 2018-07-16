@@ -93,6 +93,14 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   private robotSensor: Map<string, any>;
   private isControlEnable = false;
 
+  roundValue(item){
+    
+    for( var key of Object.keys(item)){
+      if(typeof item[key] == "string") continue;
+      item[key] = Math.round(item[key] * 100) / 100
+    }
+  }
+
   constructor(robotService: RobotStateService, http: HttpClient) { 
     this.robotService = robotService;
     this.robot = new Map<string, any>();
@@ -111,6 +119,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
         var item = this.robot.get(this.robotService.selectJointSensorName);
         if (item != null){
           this.robotState = item;
+          this.roundValue(this.robotState);
           this.isJoint = true;
           var limit = this.robotService.limits.get(this.robotService.selectJointSensorName);
           if (limit != null)
@@ -122,10 +131,14 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
           var items = this.robotSensor.get(this.robotService.selectJointSensorName);
           if (items != null){
             this.sensorType = items.type;
-            if (items.type == "ft")
+            if (items.type == "ft"){
               this.robotSensorFTState = items;
-            else if (items.type == "imu")
+              this.roundValue(this.robotSensorFTState);
+            }
+            else if (items.type == "imu"){
               this.robotSensorIMUState = items;
+              this.roundValue(this.robotSensorIMUState);
+            }
             this.isJoint = false;
           }
       }

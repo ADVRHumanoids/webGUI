@@ -23,9 +23,10 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { WebsocketService } from './websocket.service';
 import {BehaviorSubject} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
+import { OnDestroy } from '@angular/core';
 
 @Injectable()
-export class RobotStateService {
+export class RobotStateService implements OnDestroy {
 
   private messages: Subject<any>;
   private robot: Map<string, any>;
@@ -72,6 +73,12 @@ export class RobotStateService {
     renderer: null,
     state: 0
   };
+
+  ngOnDestroy() {
+    clearTimeout(this.timeout);
+    this.sub.unsubscribe();
+    console.log("destory ser");
+  }
 
   public changeView(param){
     //console.log("enableModelView"+ param);
@@ -191,7 +198,7 @@ export class RobotStateService {
       var efforts = robot["effort"];
       var stiffs = robot["stiffness"];
       var damps = robot["damping"];
-      var faults = robot["fault_string"];
+      var faults = <string>robot["fault_string"];
       var posrefs = robot["pos_ref"];
       var velrefs = robot["vel_ref"];
       var torrefs = robot["eff_ref"];
@@ -201,24 +208,24 @@ export class RobotStateService {
       //if (barTopic != null)
       if (this.currentBarAddDatamsg.get(0)!= null)
         this.barAddDataMsg.get(0).next({"robot":robot,"topic":this.currentTopicBar});
-
+        
       for (let i = 0; i < nameList.length ; i++) {
         var obj = {
           name: nameList[i],
           id: ids[i],
-          motorPos: Math.round(motors[i] * 100) / 100,
-          linkPos: Math.round(links[i] * 100) / 100,
-          motorVel: Math.round(motorsv[i] * 100) / 100,
-          linkVel: Math.round(linksv[i] * 100) / 100,
+          motorPos: motors[i],
+          linkPos: links[i],
+          motorVel: motorsv[i],
+          linkVel: linksv[i],
           temp: temps[i],
-          effort: Math.round(efforts[i] * 100) / 100,
-          stiff: Math.round(stiffs[i] * 100) / 100,
-          damp: Math.round(damps[i] * 100) / 100,
+          effort: efforts[i],
+          stiff: stiffs[i],
+          damp: damps[i],
           fault: faults[i],
-          aux: Math.round(auxs[i] * 100) / 100,
-          refPos: Math.round(posrefs[i] * 100) / 100,
-          refVel: Math.round(velrefs[i] * 100) / 100,
-          refTor: Math.round(torrefs[i] * 100) / 100
+          aux: auxs[i],
+          refPos: posrefs[i],
+          refVel: velrefs[i],
+          refTor: torrefs[i]
         };
         this.robot.set(nameList[i], obj);
         var keys =  Object.keys(obj);
