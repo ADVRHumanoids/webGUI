@@ -47,14 +47,14 @@ export class WebsocketService {
 
     private create(url): Rx.Subject<MessageEvent> {
 
-      
+      //console.log("before ws");
       if (this.ws != null) {
         //this.ws.close();
         delete this.ws;
         this.ws = null;
       }
       this.ws = new WebSocket(url);
-      
+           
       this.ws.onopen = () => this.onOpen();
 
       let observable = Rx.Observable.create(
