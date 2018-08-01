@@ -36,10 +36,9 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   private dval = 0.0;
 
   public limit = {
-    llim: 0, 
-    ulim:0, 
-    efflim: 0,
-    vellim: 0
+    poslim : { llim: 0, ulim:0}, 
+    efflim: { llim: 0, ulim:0},
+    vellim: { llim: 0, ulim:0}
   }
 
   private robotState = {

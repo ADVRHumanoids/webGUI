@@ -44,7 +44,13 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
   private subPlotAddmsg : Subscription;
   private subPlotClearmsg : Subscription;
   public topics = [];
+  public currentTopic :string;
   private timeout;
+
+  private mapTopicLimit: Map<string, string> = new Map<string, string>();
+
+  private ulimvec;
+  private llimvec;
 
   private chartColors = {
     red: 'rgb(255, 99, 132)',
@@ -58,6 +64,18 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
 
   constructor(robotService: RobotStateService) {
     this.robotService = robotService;
+    this.currentTopic = "";
+    this.mapTopicLimit.set("link_position","poslim");
+    this.mapTopicLimit.set("motor_position","poslim");
+    this.mapTopicLimit.set("pos_ref","poslim");
+    this.mapTopicLimit.set("link_velocity","vellim");
+    this.mapTopicLimit.set("motor_velocity","vellim");
+    this.mapTopicLimit.set("vel_ref","vellim");
+    this.mapTopicLimit.set("effort","efflim");
+    this.mapTopicLimit.set("eff_ref","efflim");
+    this.mapTopicLimit.set("temperature","templim");
+    this.mapTopicLimit.set("aux","auxlim");
+
     if( this.label == null) this.label = "Plotter";
     this.data = {
       labels: [],
@@ -130,8 +148,10 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
             mode: 'nearest',
             intersect: true
           },*/
+          scaleBeginAtZero: false,
           scales: {
             xAxes: [{
+              stacked: true,
               display: false,
               scaleLabel: {
                 display: true,
@@ -139,6 +159,7 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
               }
             }],
             yAxes: [{
+              //stacked: true,
               display: true,
               ticks: {
                 //stepSize: 0.5
@@ -152,7 +173,7 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
           }
         }
       });
-  
+     
       this.robotService.registerBarChartComponent(parseInt(this.idPlot));
       this.subPlotAddDatamsg = this.robotService.currentBarAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
         
@@ -170,6 +191,28 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
           this.topics = keys;
 
           this.addDataset(joint);
+
+          if( this.currentTopic != topicname){
+            this.currentTopic = topicname;
+            var limitType = this.mapTopicLimit.get(topicname);
+            for (var i = 0; i < joint.length; i++) {            
+              var obj = this.robotService.limits.get(joint[i]);
+              if (obj != null) {
+                var lim = obj[limitType];
+                if (lim != null){
+                  this.ulimvec[i] = lim.ulim;
+                  this.llimvec[i] = lim.llim;
+                } 
+                else
+                {
+                  this.ulimvec[i] = 0;
+                  this.llimvec[i] = 0;
+                }              
+              }
+            }
+          this.updateLimits(this.ulimvec,this.llimvec);
+          }
+          
           this.setLabel(topicname);
           this.addDataToDataset(topic);
         }
@@ -200,7 +243,27 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
         data: new Array(msg.length)}; //msg["value"]
       this.data.labels = msg;
       this.data.datasets.push(data);
+
+      var dataULimit = {
+        label: "ULimit",
+        backgroundColor: 'rgb(255, 179, 179)',
+        borderColor: 'rgb(255, 179, 179)',
+        borderWidth: 1,
+        data: new Array(msg.length)}; //msg["value"]
+      this.data.datasets.push(dataULimit);
+
+      var dataLLimit = {
+        label: "LLimit",
+        backgroundColor: 'rgb(255, 179, 179)',
+        borderColor: 'rgb(255, 179, 179)',
+        borderWidth: 1,
+        data: new Array(msg.length)}; //msg["value"]
+      this.data.datasets.push(dataLLimit);
+
+      this.ulimvec = new Array(msg.length);
+      this.llimvec = new Array(msg.length);
     }
+      
   }
 
   setLabel(label){
@@ -221,5 +284,14 @@ export class BarChartComponent implements OnInit,AfterViewInit, OnDestroy {
       this.data.datasets[0].data[i] = msg[i];
     }
     this.myChart.update(0);
+  }
+
+  updateLimits(ulim, llim){
+
+    for (let i = 0; i < this.data.labels.length; i++) {
+      this.data.datasets[1].data[i] = ulim[i];
+      this.data.datasets[2].data[i] = llim[i];
+    }
+    //this.myChart.update(0);
   }
 }

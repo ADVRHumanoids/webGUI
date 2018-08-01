@@ -75,9 +75,16 @@ export class RobotStateService implements OnDestroy {
   };
 
   ngOnDestroy() {
+    this.dispose();
+  }
+
+  dispose(){
+
+    //console.log("DESTROY SERVICE");
     clearTimeout(this.timeout);
-    this.sub.unsubscribe();
-    console.log("destory ser");
+    if (this.sub != null) this.sub.unsubscribe();
+    window.removeEventListener('unload', this.dispose);
+
   }
 
   public changeView(param){
@@ -139,6 +146,7 @@ export class RobotStateService implements OnDestroy {
 
   constructor(private wsService: WebsocketService, public snackBar: MatSnackBar) { 
 
+    window.addEventListener('unload', this.dispose);
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();
     this.registerSelectedJoint();
