@@ -24,6 +24,10 @@ import { WebsocketService } from './websocket.service';
 import {BehaviorSubject} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
 import { OnDestroy } from '@angular/core';
+import { HttpService } from './../services/http.service';
+import { HttpClient } from '@angular/common/http';
+import { NotFoundError } from './../common/not-foud-error';
+import { AppError } from './../common/app-error';
 
 @Injectable()
 export class RobotStateService implements OnDestroy {
@@ -63,6 +67,7 @@ export class RobotStateService implements OnDestroy {
   public allPlotsViewFlag = false;
   public controlPanelViewFlag = false;
   public toggleModel = "Model";
+  private service;
 
   public CanvasState = {
     scene : null,
@@ -81,6 +86,7 @@ export class RobotStateService implements OnDestroy {
   dispose(){
 
     //console.log("DESTROY SERVICE");
+    if (this.wsService != null) this.wsService.close();
     clearTimeout(this.timeout);
     if (this.sub != null) this.sub.unsubscribe();
     window.removeEventListener('unload', this.dispose);
@@ -118,8 +124,18 @@ export class RobotStateService implements OnDestroy {
 
   reconnect(){
     this.timeout = setTimeout(()=>{
-      console.log("WebSocket reconnect attempt");
-      this.connectWebSocket();     
+      console.log("WebSocket reconnect attempt");      
+      this.service.get("/plugins")
+      .subscribe(
+        response => {          
+          console.log("Server Reachable");
+          this.connectWebSocket(); 
+        },
+        (error: AppError) => {  
+          this.snackBar.open("OFF-LINE",null,{
+            duration: 3000});
+         this.reconnect();          
+         }); 
     },5000);
   }
 
@@ -144,8 +160,9 @@ export class RobotStateService implements OnDestroy {
      },(err) => this.onError(err), () => this.onClose());
   }
 
-  constructor(private wsService: WebsocketService, public snackBar: MatSnackBar) { 
+  constructor(private wsService: WebsocketService, public snackBar: MatSnackBar, http: HttpClient) { 
 
+    this.service = new HttpService(http);
     window.addEventListener('unload', this.dispose);
     this.robot = new Map<string, any>();
     this.robotSensor = new Map<string, any>();

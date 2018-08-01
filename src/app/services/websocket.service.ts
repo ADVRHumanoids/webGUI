@@ -30,6 +30,7 @@ export class WebsocketService {
 
     private subject: Rx.Subject<MessageEvent>;
     public messages: Subject<any>;
+    private ws : WebSocket;
   
     private connectInternal(url): Rx.Subject<MessageEvent> {
         this.subject = this.create(url);
@@ -37,33 +38,49 @@ export class WebsocketService {
     }
   
     onOpen(){
-      console.log("Successfully connected: ");
-      this.snackBar.open("ON-LINE",null,{
-        duration: 3000});
+      if (this.ws.readyState === WebSocket.OPEN) {
+        console.log("Successfully connected: ");
+        this.snackBar.open("ON-LINE",null,{
+          duration: 3000});
+      }
     }
 
     private create(url): Rx.Subject<MessageEvent> {
 
-      let ws = new WebSocket(url);
-      ws.onopen = () => this.onOpen();
+      console.log("before ws");
+      if (this.ws != null) {
+        //this.ws.close();
+        delete this.ws;
+        this.ws = null;
+      }
+      this.ws = new WebSocket(url);
+      console.log(this.ws);
+      console.log("after ws");
+      console.log(this.ws.readyState);
+      
+      this.ws.onopen = () => this.onOpen();
 
       let observable = Rx.Observable.create(
           (obs: Rx.Observer<MessageEvent>) => {
           //ws.onopen.bind(this.onOpen);
-          ws.onmessage = obs.next.bind(obs);
-          ws.onerror = obs.error.bind(obs);
-          ws.onclose = obs.complete.bind(obs);
-          return ws.close.bind(ws);
+          this.ws.onmessage = obs.next.bind(obs);
+          this.ws.onerror = obs.error.bind(obs);
+          this.ws.onclose = obs.complete.bind(obs);
+          return this.ws.close.bind(this.ws);
           })
 
       let observer = {
           next: (data: Object) => {
-            if (ws.readyState === WebSocket.OPEN) {
-              ws.send(JSON.stringify(data));
+            if (this.ws.readyState === WebSocket.OPEN) {
+              this.ws.send(JSON.stringify(data));
             }
           }
         }
         return Rx.Subject.create(observer, observable);
+    }
+
+    public close(){
+      this.ws.close();      
     }
 
     public connect(url){
