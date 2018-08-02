@@ -68,6 +68,9 @@ export class RobotStateService implements OnDestroy {
   public controlPanelViewFlag = false;
   public toggleModel = "Model";
   private service;
+  private interval;
+
+  public plotUpdateMap = new Map<number, any >();
 
   public CanvasState = {
     scene : null,
@@ -88,6 +91,7 @@ export class RobotStateService implements OnDestroy {
     //console.log("DESTROY SERVICE");
     if (this.wsService != null) this.wsService.close();
     clearTimeout(this.timeout);
+    clearInterval(this.interval);
     if (this.sub != null) this.sub.unsubscribe();
     window.removeEventListener('unload', this.dispose);
 
@@ -168,9 +172,16 @@ export class RobotStateService implements OnDestroy {
     this.robotSensor = new Map<string, any>();
     this.registerSelectedJoint();
     this.registerCtrlSelectedJoint();
-    this.connectWebSocket();       
-  }
-  
+    this.connectWebSocket(); 
+    this.interval = setInterval(()=>{       
+      this.plotUpdateMap.forEach((mycallback: any, key: number) => {
+        if( mycallback != null){
+          mycallback();
+        }
+      });
+    },20); //50Hz
+  } 
+
   publishMsg(msg){
     this.parsedMsg.next(msg);
   }

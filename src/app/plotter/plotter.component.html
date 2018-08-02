@@ -15,7 +15,7 @@ fxLayoutGap.xs="0">
         <button mat-raised-button color="primary" type="button" (click)="clearData()">Clear</button> 
         <button mat-raised-button color="primary" type="button" (click)="freeze()">Pause</button>
         Scale <input #Scale name="range" step="0.1" (change)="setScale(Scale.value)" style=" width:50px" > 
-        Sample <input #Sample name="range" step="0.1" (change)="setSample(Sample.value)" style=" width:50px"> 
+        Sample <input #Sample name="range" step="0.1" value = {{samples}} (change)="setSample(Sample.value)" style=" width:50px"> 
       </div> 
     </div>
   </div>

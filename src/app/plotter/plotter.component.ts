@@ -41,7 +41,7 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
   private myChart: any;
   private isResponsive: boolean;
   private robotService: RobotStateService;
-  private samples: number;
+  public samples: number;
   private delete: boolean;
   private isfrozen: boolean;
   private map: Map<string, number>;
@@ -50,6 +50,9 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
   private subPlotClearmsg : Subscription;
   private interval;
   private timeout;
+  private isloaded: boolean = false;
+  private labels : Array<any> = new Array<any>();
+  private datas : Map<number, any> = new Map<number, any>();
 
   private chartColors = {
     red: 'rgb(255, 99, 132)',
@@ -71,17 +74,6 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
       datasets: []
     };
     this.map = new Map<string, number> ();
-
-    this.interval = setInterval(()=>{ 
-      if (this.isfrozen)return;
-      if(this.data.labels.length > this.samples)
-        this.data.labels.splice(0, 1);
-        for (let d of this.data.datasets){
-          if(d.data.length > this.samples)
-            d.data.splice(0, 1);
-        }
-    },10);
-    
   } 
 
   getId(){
@@ -163,11 +155,33 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
       });
   
       this.robotService.registerPlotterComponent(parseInt(this.idPlot), this.fields);
+
+      this.robotService.plotUpdateMap.set(parseInt(this.idPlot), () => {
+
+        if (this.isfrozen) return;
+        if (this.data.datasets.length == 0) return;
+        if (this.isloaded){
+          this.data.labels.push(new Date());
+          var llblength = this.data.labels.length;
+          if(llblength > this.samples)
+            this.data.labels.splice(0, llblength - this.samples);
+
+            for (var i = 0; i < this.data.datasets.length; i++) {
+              var val = this.datas.get(i);
+              this.data.datasets[i].data.push(val);
+              var datailength = this.data.datasets[i].data.length;
+              if(datailength > this.samples)
+                this.data.datasets[i].data.splice(0, datailength - this.samples);
+            }
+            this.myChart.update();          
+        }
+      });
+
       this.subPlotAddDatamsg = this.robotService.currentPlotAddDatamsg.get(parseInt(this.idPlot)).subscribe(msg => {		
         
         if(msg == null)return;
         if (this.isfrozen)return;
-        this.data.labels.push(new Date());
+        
         for (let pdata of msg){
           var name = pdata["name"];
           if(name == null) return;
@@ -175,7 +189,7 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
           var value = pdata["value"];
           value = Math.round(value * 100) / 100;
           //console.log("ACCESS TO pos "+ i +" value "+value);
-          this.addDataToDataset(this.data.datasets[i],value);
+          this.addDataToDataset(i,value);
         }
       });
   
@@ -183,6 +197,7 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
         if(msg == null)return;
         var topic = msg["topic"];
         if( topic == null) return;
+
         var id = msg["id"];
         var name = msg["name"];
         this.addDataset(name+"/"+topic);
@@ -195,6 +210,8 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
         if(msg == null)return;
         this.clearData();
       });
+
+      this.isloaded = true;
     },100);
     
   }
@@ -208,13 +225,13 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
       this.subPlotAddmsg.unsubscribe();
     if(this.subPlotClearmsg != null)
       this.subPlotClearmsg.unsubscribe();
-    clearInterval(this.interval);
+    //clearInterval(this.interval);
+    this.robotService.plotUpdateMap.set(parseInt(this.idPlot), null);
     this.robotService = null;
-    this.map = null;
-   }
+    this.map = null;    
+  }
 
   setScale(val){
-
     this.myChart.options.scales.yAxes[0].ticks.stepSize = val;
   }
 
@@ -254,14 +271,11 @@ export class PlotterComponent implements AfterViewInit, OnDestroy{
         d.data = [];
 
     this.data.datasets.push(data);
-    this.myChart.update();
   }
 
-  addDataToDataset(dataset, value){
-
-    dataset.data.push(value);
+  addDataToDataset(index, value){
+    this.datas.set(index,value);    
     //console.log("label "+ dataset.label+ " "+dataset.data.length);
-    this.myChart.update();
   }
 
 }
